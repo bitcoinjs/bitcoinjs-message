@@ -1,0 +1,42 @@
+{
+  "name": "bitcoin-message",
+  "version": "1.0.0",
+  "description": "bitcoin-message",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bitcoinjs/bitcoin-message.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bitcoinjs/bitcoin-message/issues"
+  },
+  "homepage": "https://github.com/bitcoinjs/bitcoin-message",
+  "keywords": [
+    "bitcoin-message"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "coverage": "mocha --require blanket -R travis-cov",
+    "coverage-local": "mocha --require blanket -R html-cov",
+    "prepublish": "npm run test",
+    "standard": "standard",
+    "test": "npm run standard && npm run unit",
+    "unit": "mocha"
+  },
+  "config": {
+    "blanket": {
+      "pattern": [""],
+      "data-cover-never": ["node_modules", "test"]
+    },
+    "travis-cov": {
+      "threshold": 99
+    }
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "blanket": "*",
+    "mocha": "*",
+    "standard": "*",
+    "travis-cov": "*"
+  }
+}
