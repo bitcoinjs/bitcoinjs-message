@@ -1,18 +1,19 @@
 {
-  "name": "bitcoin-message",
+  "name": "bitcoinjs-message",
   "version": "1.0.0",
-  "description": "bitcoin-message",
+  "description": "bitcoinjs-message",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bitcoinjs/bitcoin-message.git"
+    "url": "https://github.com/bitcoinjs/bitcoinjs-message.git"
   },
   "bugs": {
-    "url": "https://github.com/bitcoinjs/bitcoin-message/issues"
+    "url": "https://github.com/bitcoinjs/bitcoinjs-message/issues"
   },
-  "homepage": "https://github.com/bitcoinjs/bitcoin-message",
+  "homepage": "https://github.com/bitcoinjs/bitcoinjs-message",
   "keywords": [
-    "bitcoin-message"
+    "bitcoinjs-message",
+    "bitcoin"
   ],
   "main": "index.js",
   "scripts": {
