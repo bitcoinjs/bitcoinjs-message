@@ -2,13 +2,13 @@
 
 var assert = require('assert')
 var bitcoin = require('bitcoinjs-lib')
+var compactSignature = require('../signature')
 var ecdsa = require('../ecdsa')
-var message = require('../')
 
 var BigInteger = require('bigi')
 var curve = ecdsa.__curve
 
-var fixtures = require('./fixtures-ecdsa.json')
+var fixtures = require('./fixtures-ecdsa')
 
 describe('ecdsa', function () {
   function fromRaw (signature) {
@@ -24,9 +24,8 @@ describe('ecdsa', function () {
         var d = BigInteger.fromHex(f.d)
         var Q = curve.G.multiply(d)
         var signature = fromRaw(f.signature)
-        var h1 = bitcoin.crypto.sha256(f.message)
-        var e = BigInteger.fromBuffer(h1)
-        var Qprime = ecdsa.recoverPubKey(e, signature, f.i)
+        var hash = bitcoin.crypto.sha256(f.message)
+        var Qprime = ecdsa.recoverPubKey(hash, signature, f.i)
 
         assert(Qprime.equals(Q))
       })
@@ -34,10 +33,9 @@ describe('ecdsa', function () {
 
     describe('with i ∈ {0,1,2,3}', function () {
       var hash = new Buffer('feef89995d7575f12d65ccc9d28ccaf7ab224c2e59dad4cc7f6a2b0708d24696', 'hex')
-      var e = BigInteger.fromBuffer(hash)
 
       var signatureBuffer = new Buffer('INcvXVVEFyIfHLbDX+xoxlKFn3Wzj9g0UbhObXdMq+YMKC252o5RHFr0/cKdQe1WsBLUBi4morhgZ77obDJVuV0=', 'base64')
-      var signature = message.parseCompactSignature(signatureBuffer).signature
+      var signature = compactSignature.decode(signatureBuffer).signature
       var points = [
         '03e3a8c44a8bf712f1fbacee274fb19c0239b1a9e877eff0075ea335f2be8ff380',
         '0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798',
@@ -47,7 +45,7 @@ describe('ecdsa', function () {
 
       points.forEach(function (expectedHex, i) {
         it('recovers an expected point for i of ' + i, function () {
-          var Qprime = ecdsa.recoverPubKey(e, signature, i)
+          var Qprime = ecdsa.recoverPubKey(hash, signature, i)
           var QprimeHex = Qprime.getEncoded().toString('hex')
 
           assert.strictEqual(QprimeHex, expectedHex)
@@ -55,13 +53,13 @@ describe('ecdsa', function () {
       })
     })
 
-    fixtures.invalid.recoverPubKey.forEach(function (f) {
+    fixtures.invalid.forEach(function (f) {
       it('throws on ' + f.description + ' (' + f.exception + ')', function () {
-        var e = BigInteger.fromHex(f.e)
+        var hash = new Buffer(f.e, 'hex')
         var signature = fromRaw(f.signature)
 
         assert.throws(function () {
-          ecdsa.recoverPubKey(e, signature, f.i)
+          ecdsa.recoverPubKey(hash, signature, f.i)
         }, new RegExp(f.exception))
       })
     })

@@ -10,18 +10,9 @@ var ecurve = require('ecurve')
 var secp256k1 = ecurve.getCurveByName('secp256k1')
 var typeforce = require('typeforce')
 
-var rPK_TYPE = typeforce.tuple(
-  'BigInteger',
-  {
-    r: 'BigInteger',
-    s: 'BigInteger'
-  },
-  function UInt2 (value) { return (value & 3) === value }
-)
+var BigInteger = require('bigi')
 
-function recoverPubKey (e, signature, i) {
-  typeforce(rPK_TYPE, arguments)
-
+function __recoverPubKey (e, signature, i) {
   var n = secp256k1.n
   var G = secp256k1.G
   var r = signature.r
@@ -60,6 +51,26 @@ function recoverPubKey (e, signature, i) {
   return Q
 }
 
+var rPK_TYPE = typeforce.tuple(
+  function Buffer256 (value) {
+    return Buffer.isBuffer(value) && value.length === 32
+  },
+  {
+    r: 'BigInteger',
+    s: 'BigInteger'
+  },
+  function UInt2 (value) {
+    return (value & 3) === value
+  }
+)
+
+function recoverPubKey (hash, signature, i) {
+  typeforce(rPK_TYPE, arguments)
+  var e = BigInteger.fromBuffer(hash)
+
+  return __recoverPubKey(e, signature, i)
+}
+
 /**
   * Calculate pubkey extraction parameter.
   *
@@ -71,9 +82,11 @@ function recoverPubKey (e, signature, i) {
   * This function simply tries all four cases and returns the value
   * that resulted in a successful pubkey recovery.
   */
-function calcPubKeyRecoveryParam (e, signature, Q) {
+function calcPubKeyRecoveryParam (hash, signature, Q) {
+  var e = BigInteger.fromBuffer(hash)
+
   for (var i = 0; i < 4; i++) {
-    var Qprime = recoverPubKey(e, signature, i)
+    var Qprime = __recoverPubKey(e, signature, i)
 
     // 1.6.2 Verify Q
     if (Qprime.equals(Q)) return i
