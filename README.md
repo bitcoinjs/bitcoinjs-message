@@ -1,4 +1,4 @@
-# bitcoin-message
+# bitcoinjs-message
 
 [![TRAVIS](https://secure.travis-ci.org/bitcoinjs/bitcoin-message.png)](http://travis-ci.org/bitcoinjs/bitcoin-message)
 [![NPM](http://img.shields.io/npm/v/bitcoin-message.svg)](https://www.npmjs.org/package/bitcoin-message)
