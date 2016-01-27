@@ -1,10 +1,9 @@
 # bitcoinjs-message
 
-[![TRAVIS](https://secure.travis-ci.org/bitcoinjs/bitcoinjs-message.png)](http://travis-ci.org/bitcoinjs/bitcoinjs-message)
-[![NPM](http://img.shields.io/npm/v/bitcoinjs-message.svg)](https://www.npmjs.org/package/bitcoinjs-message)
+[![NPM Package](https://img.shields.io/npm/v/secp256k1.svg)](https://www.npmjs.org/package/bitcoinjs-message)
+[![Build Status](https://img.shields.io/travis/bitcoinjs/bitcoinjs-message.svg?branch=master)](https://travis-ci.org/bitcoinjs/bitcoinjs-message)
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
-
 
 ## Example Usage
 

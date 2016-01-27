@@ -2,20 +2,26 @@
   "name": "bitcoinjs-message",
   "version": "1.0.0",
   "description": "bitcoinjs-message",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/bitcoinjs/bitcoinjs-message.git"
-  },
-  "bugs": {
-    "url": "https://github.com/bitcoinjs/bitcoinjs-message/issues"
-  },
-  "homepage": "https://github.com/bitcoinjs/bitcoinjs-message",
   "keywords": [
     "bitcoinjs-message",
     "bitcoin"
   ],
-  "main": "index.js",
+  "homepage": "https://github.com/bitcoinjs/bitcoinjs-message",
+  "bugs": {
+    "url": "https://github.com/bitcoinjs/bitcoinjs-message/issues"
+  },
+  "license": "MIT",
+  "files": [
+    "index.js",
+    "LICENSE",
+    "package.json",
+    "README.md"
+  ],
+  "main": "./index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bitcoinjs/bitcoinjs-message.git"
+  },
   "scripts": {
     "coverage": "mocha --require blanket -R travis-cov",
     "coverage-local": "mocha --require blanket -R html-cov",
@@ -39,16 +45,18 @@
     }
   },
   "dependencies": {
-    "bigi": "^1.4.0",
     "bitcoinjs-lib": "^2.0.0",
     "bs58check": "^1.0.0",
-    "ecurve": "^1.0.0",
-    "typeforce": "^1.3.0"
+    "secp256k1": "^3.0.0"
   },
   "devDependencies": {
+    "bigi": "^1.4.1",
     "blanket": "*",
     "mocha": "*",
     "standard": "*",
     "travis-cov": "*"
+  },
+  "engines": {
+    "node": ">=0.10"
   }
 }
