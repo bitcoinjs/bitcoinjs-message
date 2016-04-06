@@ -1,94 +1,61 @@
-/* global describe, it */
-
-var assert = require('assert')
+var test = require('tape').test
 var bitcoin = require('bitcoinjs-lib')
 var BigInteger = require('bigi')
 var message = require('../')
 
 var fixtures = require('./fixtures.json')
-var NETWORKS = bitcoin.networks
 
-describe('message', function () {
-  describe('_encodeSignature', function () {
-    fixtures.valid.signature.forEach(function (f) {
-      it('exports ' + f.hex + ' correctly', function () {
-        var signature = new Buffer(f.signature, 'hex')
-        var buffer = message._encodeSignature(signature, f.recovery, f.compressed)
+function getMessagePrefix (networkName) {
+  return bitcoin.networks[networkName].messagePrefix
+}
 
-        assert.strictEqual(buffer.toString('hex'), f.hex)
-      })
-    })
+fixtures.valid.magicHash.forEach(function (f) {
+  test('produces the magicHash for "' + f.message + '" (' + f.network + ')', function (t) {
+    var actual = message.magicHash(f.message, getMessagePrefix(f.network))
+    t.same(actual.toString('hex'), f.magicHash)
+    t.end()
   })
+})
 
-  describe('_decodeSignature', function () {
-    fixtures.valid.signature.forEach(function (f) {
-      it('imports ' + f.hex + ' correctly', function () {
-        var buffer = new Buffer(f.hex, 'hex')
-        var decode = message._decodeSignature(buffer)
+fixtures.valid.sign.forEach(function (f) {
+  test('sign: ' + f.description, function (t) {
+    var pk = new bitcoin.ECPair(new BigInteger(f.d)).d.toBuffer(32)
+    var signature = message.sign(f.message, getMessagePrefix(f.network), pk, false)
+    t.same(signature.toString('base64'), f.signature)
 
-        assert.deepEqual(decode, {
-          signature: new Buffer(f.signature, 'hex'),
-          recovery: f.recovery,
-          compressed: f.compressed
-        })
-      })
-    })
+    if (f.compressed) {
+      signature = message.sign(f.message, getMessagePrefix(f.network), pk, true)
+      t.same(signature.toString('base64'), f.compressed.signature)
+    }
 
-    fixtures.invalid.signature.forEach(function (f) {
-      it('throws on ' + f.hex, function () {
-        var buffer = new Buffer(f.hex, 'hex')
-
-        assert.throws(function () {
-          message._decodeSignature(buffer)
-        }, new RegExp(f.exception))
-      })
-    })
+    t.end()
   })
+})
 
-  describe('magicHash', function () {
-    fixtures.valid.magicHash.forEach(function (f) {
-      it('produces the magicHash for "' + f.message + '" (' + f.network + ')', function () {
-        var actual = message.magicHash(f.message, NETWORKS[f.network])
+fixtures.valid.verify.forEach(function (f) {
+  test('verifies a valid signature for "' + f.message + '" (' + f.network + ')', function (t) {
+    t.true(message.verify(f.message, getMessagePrefix(f.network), f.address, f.signature))
 
-        assert.strictEqual(actual.toString('hex'), f.magicHash)
-      })
-    })
+    if (f.compressed) {
+      t.true(message.verify(f.message, getMessagePrefix(f.network), f.compressed.address, f.compressed.signature))
+    }
+
+    t.end()
   })
+})
 
-  describe('sign', function () {
-    fixtures.valid.sign.forEach(function (f) {
-      it(f.description, function () {
-        var keyPair = new bitcoin.ECPair(new BigInteger(f.d), null, {
-          compressed: false
-        })
-        var signature = message.sign(keyPair, f.message, NETWORKS[f.network])
-        assert.strictEqual(signature.toString('base64'), f.signature)
-
-        if (f.compressed) {
-          var compressedPrivKey = new bitcoin.ECPair(new BigInteger(f.d))
-          var compressedSignature = message.sign(compressedPrivKey, f.message)
-
-          assert.strictEqual(compressedSignature.toString('base64'), f.compressed.signature)
-        }
-      })
-    })
+fixtures.invalid.signature.forEach(function (f) {
+  test('decode signature: throws on ' + f.hex, function (t) {
+    t.throws(function () {
+      message.verify(null, null, null, new Buffer(f.hex, 'hex'))
+    }, new RegExp('^Error: ' + f.exception + '$'))
+    t.end()
   })
+})
 
-  describe('verify', function () {
-    fixtures.valid.verify.forEach(function (f) {
-      it('verifies a valid signature for "' + f.message + '" (' + f.network + ')', function () {
-        assert(message.verify(f.address, f.signature, f.message, NETWORKS[f.network]))
-
-        if (f.compressed) {
-          assert(message.verify(f.compressed.address, f.compressed.signature, f.message, NETWORKS[f.network]))
-        }
-      })
-    })
-
-    fixtures.invalid.verify.forEach(function (f) {
-      it(f.description, function () {
-        assert(!message.verify(f.address, f.signature, f.message))
-      })
-    })
+fixtures.invalid.verify.forEach(function (f) {
+  test(f.description, function (t) {
+    t.false(message.verify(f.message, getMessagePrefix('bitcoin'), f.address, f.signature))
+    t.end()
   })
 })

@@ -32,7 +32,7 @@ function decodeSignature (buffer) {
   }
 }
 
-exports.magicHash = function (message, messagePrefix) {
+function magicHash (message, messagePrefix) {
   var messageVISize = varuint.encodingLength(message.length)
   var buffer = new Buffer(messagePrefix.length + messageVISize + message.length)
 
@@ -43,13 +43,13 @@ exports.magicHash = function (message, messagePrefix) {
   return hash256(buffer)
 }
 
-exports.sign = function (message, messagePrefix, privateKey, compressed) {
+function sign (message, messagePrefix, privateKey, compressed) {
   var hash = magicHash(message, messagePrefix)
   var sigObj = secp256k1.sign(hash, privateKey)
   return encodeSignature(sigObj.signature, sigObj.recovery, compressed)
 }
 
-exports.verify = function (message, messagePrefix, address, signature) {
+function verify (message, messagePrefix, address, signature) {
   if (!Buffer.isBuffer(signature)) signature = new Buffer(signature, 'base64')
 
   var parsed = decodeSignature(signature)
@@ -60,4 +60,10 @@ exports.verify = function (message, messagePrefix, address, signature) {
   var expected = bs58check.decode(address).slice(1)
 
   return bufferEquals(actual, expected)
+}
+
+module.exports = {
+  magicHash: magicHash,
+  sign: sign,
+  verify: verify
 }

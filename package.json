@@ -12,10 +12,7 @@
   },
   "license": "MIT",
   "files": [
-    "index.js",
-    "LICENSE",
-    "package.json",
-    "README.md"
+    "index.js"
   ],
   "main": "./index.js",
   "repository": {
@@ -23,26 +20,11 @@
     "url": "https://github.com/bitcoinjs/bitcoinjs-message.git"
   },
   "scripts": {
-    "coverage": "mocha --require blanket -R travis-cov",
-    "coverage-local": "mocha --require blanket -R html-cov",
+    "coverage": "nyc tape test/*.js",
     "prepublish": "npm run test",
     "standard": "standard",
     "test": "npm run standard && npm run unit",
-    "unit": "mocha"
-  },
-  "config": {
-    "blanket": {
-      "pattern": [
-        ""
-      ],
-      "data-cover-never": [
-        "node_modules",
-        "test"
-      ]
-    },
-    "travis-cov": {
-      "threshold": 99
-    }
+    "unit": "tape test/*.js"
   },
   "dependencies": {
     "bs58check": "^1.0.8",
@@ -53,10 +35,10 @@
   },
   "devDependencies": {
     "bigi": "^1.4.1",
-    "blanket": "*",
-    "mocha": "*",
-    "standard": "*",
-    "travis-cov": "*"
+    "bitcoinjs-lib": "^2.2.0",
+    "nyc": "^6.2.1",
+    "standard": "^6.0.8",
+    "tape": "^4.5.1"
   },
   "engines": {
     "node": ">=0.10"
