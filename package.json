@@ -45,9 +45,11 @@
     }
   },
   "dependencies": {
-    "bitcoinjs-lib": "^2.0.0",
-    "bs58check": "^1.0.0",
-    "secp256k1": "^3.0.0"
+    "bs58check": "^1.0.8",
+    "buffer-equals": "^1.0.3",
+    "create-hash": "^1.1.2",
+    "secp256k1": "^3.0.1",
+    "varuint-bitcoin": "^1.0.1"
   },
   "devDependencies": {
     "bigi": "^1.4.1",

@@ -1,25 +1,24 @@
-var bitcoin = require('bitcoinjs-lib')
 var bs58check = require('bs58check')
+var bufferEquals = require('buffer-equals')
+var createHash = require('create-hash')
 var secp256k1 = require('secp256k1')
+var varuint = require('varuint-bitcoin')
 
-/**
- * @param {Buffer} signature
- * @param {number} recovery
- * @param {boolean} compressed
- * @return {Buffer}
- */
+function hash256 (buffer) {
+  var t = createHash('sha256').update(buffer).digest()
+  return createHash('sha256').update(t).digest()
+}
+
+function hash160 (buffer) {
+  var t = createHash('sha256').update(buffer).digest()
+  return createHash('ripemd160').update(t).digest()
+}
+
 function encodeSignature (signature, recovery, compressed) {
-  if (compressed) {
-    recovery += 4
-  }
-
+  if (compressed) recovery += 4
   return Buffer.concat([new Buffer([recovery + 27]), signature])
 }
 
-/**
- * @param {Buffer} buffer
- * @return {{signature: Buffer, recovery: number, compressed: boolean}}
- */
 function decodeSignature (buffer) {
   if (buffer.length !== 65) throw new Error('Invalid signature length')
 
@@ -33,63 +32,32 @@ function decodeSignature (buffer) {
   }
 }
 
-/**
- * @param {string} message
- * @param {Object} [network]
- * @return {Buffer}
- */
-function magicHash (message, network) {
-  network = network || bitcoin.networks.bitcoin
+exports.magicHash = function (message, messagePrefix) {
+  var messageVISize = varuint.encodingLength(message.length)
+  var buffer = new Buffer(messagePrefix.length + messageVISize + message.length)
 
-  var prefix = network.messagePrefix
-  var messageVISize = bitcoin.bufferutils.varIntSize(message.length)
-  var buffer = new Buffer(prefix.length + messageVISize + message.length)
+  buffer.write(messagePrefix, 0)
+  varuint.encode(message.length, buffer, messagePrefix.length)
+  buffer.write(message, messagePrefix.length + messageVISize)
 
-  buffer.write(prefix, 0)
-  bitcoin.bufferutils.writeVarInt(buffer, message.length, prefix.length)
-  buffer.write(message, prefix.length + messageVISize)
-
-  return bitcoin.crypto.hash256(buffer)
+  return hash256(buffer)
 }
 
-/**
- * @param {bitcoinjs-lib.ECPair} keyPair
- * @param {string} message
- * @param {Object} [network]
- * @return {Buffer}
- */
-function sign (keyPair, message, network) {
-  var hash = magicHash(message, network)
-  var sigObj = secp256k1.sign(hash, keyPair.d.toBuffer(32))
-  return encodeSignature(sigObj.signature, sigObj.recovery, keyPair.compressed)
+exports.sign = function (message, messagePrefix, privateKey, compressed) {
+  var hash = magicHash(message, messagePrefix)
+  var sigObj = secp256k1.sign(hash, privateKey)
+  return encodeSignature(sigObj.signature, sigObj.recovery, compressed)
 }
 
-/**
- * @param {string} address
- * @param {(Buffer|string)} signature
- * @param {string} message
- * @param {Object} [network]
- * @return {boolean}
- */
-function verify (address, signature, message, network) {
-  if (!Buffer.isBuffer(signature)) {
-    signature = new Buffer(signature, 'base64')
-  }
+exports.verify = function (message, messagePrefix, address, signature) {
+  if (!Buffer.isBuffer(signature)) signature = new Buffer(signature, 'base64')
 
   var parsed = decodeSignature(signature)
-  var hash = magicHash(message, network)
+  var hash = magicHash(message, messagePrefix)
   var publicKey = secp256k1.recover(hash, parsed.signature, parsed.recovery, parsed.compressed)
 
-  var actual = bitcoin.crypto.hash160(publicKey)
+  var actual = hash160(publicKey)
   var expected = bs58check.decode(address).slice(1)
 
-  return bitcoin.bufferutils.equal(actual, expected)
-}
-
-module.exports = {
-  _encodeSignature: encodeSignature,
-  _decodeSignature: decodeSignature,
-  magicHash: magicHash,
-  sign: sign,
-  verify: verify
+  return bufferEquals(actual, expected)
 }
