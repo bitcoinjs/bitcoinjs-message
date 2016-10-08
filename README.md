@@ -6,7 +6,7 @@
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
-## Example Usage
+## Examples
 
 ``` javascript
 var bitcoin = require('bitcoinjs-lib') // v2.x.x
@@ -38,6 +38,4 @@ console.log(bitcoinMessage.verify(message, messagePrefix, address, signature))
 // => true
 ```
 
-## License
-
-MIT
+## LICENSE [MIT](LICENSE)
