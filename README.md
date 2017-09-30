@@ -9,17 +9,16 @@
 ## Examples
 
 ``` javascript
-var bitcoin = require('bitcoinjs-lib') // v2.x.x
+var bitcoin = require('bitcoinjs-lib') // v3.x.x
 var bitcoinMessage = require('bitcoinjs-message')
 ```
 
 Sign a Bitcoin message
-
 ``` javascript
 var keyPair = bitcoin.ECPair.fromWIF('5KYZdUEo39z3FPrtuX2QbbwGnNP5zTd7yyr2SC1j299sBCnWjss')
 var privateKey = keyPair.d.toBuffer(32)
 var message = 'This is an example of a signed message.'
-var messagePrefix = bitcoin.networks.bitcoin.messagePrefix
+var messagePrefix = '\u0018Bitcoin Signed Message:\n'
 
 var signature = bitcoinMessage.sign(message, messagePrefix, privateKey, keyPair.compressed)
 console.log(signature.toString('base64'))
@@ -27,7 +26,6 @@ console.log(signature.toString('base64'))
 ```
 
 Verify a Bitcoin message
-
 ``` javascript
 var address = '1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN'
 var signature = 'HJLQlDWLyb1Ef8bQKEISzFbDAKctIlaqOpGbrk3YVtRsjmC61lpE5ErkPRUFtDKtx98vHFGUWlFhsh3DiW6N0rE'
