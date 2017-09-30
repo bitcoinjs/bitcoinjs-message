@@ -33,6 +33,7 @@ function decodeSignature (buffer) {
 }
 
 function magicHash (message, messagePrefix) {
+  messagePrefix = messagePrefix || '\u0018Bitcoin Signed Message:\n'
   if (!Buffer.isBuffer(messagePrefix)) messagePrefix = Buffer.from(messagePrefix, 'utf8')
 
   var messageVISize = varuint.encodingLength(message.length)
@@ -43,13 +44,13 @@ function magicHash (message, messagePrefix) {
   return hash256(buffer)
 }
 
-function sign (message, messagePrefix, privateKey, compressed) {
+function sign (message, privateKey, compressed, messagePrefix) {
   var hash = magicHash(message, messagePrefix)
   var sigObj = secp256k1.sign(hash, privateKey)
   return encodeSignature(sigObj.signature, sigObj.recovery, compressed)
 }
 
-function verify (message, messagePrefix, address, signature) {
+function verify (message, address, signature, messagePrefix) {
   if (!Buffer.isBuffer(signature)) signature = Buffer.from(signature, 'base64')
 
   var parsed = decodeSignature(signature)

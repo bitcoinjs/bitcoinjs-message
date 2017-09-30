@@ -20,11 +20,11 @@ fixtures.valid.magicHash.forEach(function (f) {
 fixtures.valid.sign.forEach(function (f) {
   test('sign: ' + f.description, function (t) {
     var pk = new bitcoin.ECPair(new BigInteger(f.d)).d.toBuffer(32)
-    var signature = message.sign(f.message, getMessagePrefix(f.network), pk, false)
+    var signature = message.sign(f.message, pk, false, getMessagePrefix(f.network))
     t.same(signature.toString('base64'), f.signature)
 
     if (f.compressed) {
-      signature = message.sign(f.message, getMessagePrefix(f.network), pk, true)
+      signature = message.sign(f.message, pk, true, getMessagePrefix(f.network))
       t.same(signature.toString('base64'), f.compressed.signature)
     }
 
@@ -34,10 +34,15 @@ fixtures.valid.sign.forEach(function (f) {
 
 fixtures.valid.verify.forEach(function (f) {
   test('verifies a valid signature for "' + f.message + '" (' + f.network + ')', function (t) {
-    t.true(message.verify(f.message, getMessagePrefix(f.network), f.address, f.signature))
+    t.true(message.verify(f.message, f.address, f.signature, getMessagePrefix(f.network)))
+
+    if (f.network === 'bitcoin') {
+      // defaults to bitcoin network
+      t.true(message.verify(f.message, f.address, f.signature))
+    }
 
     if (f.compressed) {
-      t.true(message.verify(f.message, getMessagePrefix(f.network), f.compressed.address, f.compressed.signature))
+      t.true(message.verify(f.message, f.compressed.address, f.compressed.signature, getMessagePrefix(f.network)))
     }
 
     t.end()
@@ -47,7 +52,7 @@ fixtures.valid.verify.forEach(function (f) {
 fixtures.invalid.signature.forEach(function (f) {
   test('decode signature: throws on ' + f.hex, function (t) {
     t.throws(function () {
-      message.verify(null, null, null, Buffer.from(f.hex, 'hex'))
+      message.verify(null, null, Buffer.from(f.hex, 'hex'), null)
     }, new RegExp('^Error: ' + f.exception + '$'))
     t.end()
   })
@@ -55,7 +60,7 @@ fixtures.invalid.signature.forEach(function (f) {
 
 fixtures.invalid.verify.forEach(function (f) {
   test(f.description, function (t) {
-    t.false(message.verify(f.message, getMessagePrefix('bitcoin'), f.address, f.signature))
+    t.false(message.verify(f.message, f.address, f.signature, getMessagePrefix('bitcoin')))
     t.end()
   })
 })
