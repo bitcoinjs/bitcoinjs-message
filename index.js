@@ -4,19 +4,19 @@ var createHash = require('create-hash')
 var secp256k1 = require('secp256k1')
 var varuint = require('varuint-bitcoin')
 
-function hash256 (buffer) {
-  var t = createHash('sha256').update(buffer).digest()
-  return createHash('sha256').update(t).digest()
+function sha256 (b) {
+  return createHash('sha256').update(b).digest()
 }
-
+function hash256 (buffer) {
+  return sha256(sha256(buffer))
+}
 function hash160 (buffer) {
-  var t = createHash('sha256').update(buffer).digest()
-  return createHash('ripemd160').update(t).digest()
+  return createHash('ripemd160').update(sha256(buffer)).digest()
 }
 
 function encodeSignature (signature, recovery, compressed) {
   if (compressed) recovery += 4
-  return Buffer.concat([new Buffer([recovery + 27]), signature])
+  return Buffer.concat([Buffer.alloc(1, recovery + 27), signature])
 }
 
 function decodeSignature (buffer) {
@@ -33,13 +33,13 @@ function decodeSignature (buffer) {
 }
 
 function magicHash (message, messagePrefix) {
-  var messageVISize = varuint.encodingLength(message.length)
-  var buffer = new Buffer(messagePrefix.length + messageVISize + message.length)
+  if (!Buffer.isBuffer(messagePrefix)) messagePrefix = Buffer.from(messagePrefix, 'utf8')
 
-  buffer.write(messagePrefix, 0)
+  var messageVISize = varuint.encodingLength(message.length)
+  var buffer = Buffer.allocUnsafe(messagePrefix.length + messageVISize + message.length)
+  messagePrefix.copy(buffer, 0)
   varuint.encode(message.length, buffer, messagePrefix.length)
   buffer.write(message, messagePrefix.length + messageVISize)
-
   return hash256(buffer)
 }
 
@@ -50,7 +50,7 @@ function sign (message, messagePrefix, privateKey, compressed) {
 }
 
 function verify (message, messagePrefix, address, signature) {
-  if (!Buffer.isBuffer(signature)) signature = new Buffer(signature, 'base64')
+  if (!Buffer.isBuffer(signature)) signature = Buffer.from(signature, 'base64')
 
   var parsed = decodeSignature(signature)
   var hash = magicHash(message, messagePrefix)

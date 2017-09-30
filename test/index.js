@@ -6,7 +6,7 @@ var message = require('../')
 var fixtures = require('./fixtures.json')
 
 function getMessagePrefix (networkName) {
-  return bitcoin.networks[networkName].messagePrefix
+  return fixtures.networks[networkName]
 }
 
 fixtures.valid.magicHash.forEach(function (f) {
@@ -47,7 +47,7 @@ fixtures.valid.verify.forEach(function (f) {
 fixtures.invalid.signature.forEach(function (f) {
   test('decode signature: throws on ' + f.hex, function (t) {
     t.throws(function () {
-      message.verify(null, null, null, new Buffer(f.hex, 'hex'))
+      message.verify(null, null, null, Buffer.from(f.hex, 'hex'))
     }, new RegExp('^Error: ' + f.exception + '$'))
     t.end()
   })
