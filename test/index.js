@@ -64,3 +64,18 @@ fixtures.invalid.verify.forEach(function (f) {
     t.end()
   })
 })
+
+fixtures.randomSig.forEach(function (f) {
+  test(f.description, function (t) {
+    var keyPair = bitcoin.ECPair.fromWIF(f.wif)
+    var privateKey = keyPair.d.toBuffer(32)
+    var address = keyPair.getAddress()
+    f.signatures.forEach(function (s) {
+      var signature = message.sign(f.message, privateKey, keyPair.compressed, undefined, {data: Buffer.from(s.sigData, 'base64')})
+      t.true(message.verify(f.message, address, signature))
+      signature = message.sign(f.message, privateKey, keyPair.compressed, {data: Buffer.from(s.sigData, 'base64')})
+      t.true(message.verify(f.message, address, signature))
+    })
+    t.end()
+  })
+})

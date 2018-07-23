@@ -144,5 +144,22 @@
         "signature": "G8JawPtQOrybrSP1WHQnQPr67B9S3qrxBrl1mlzoTJOSHEpmnF7D3+t+LX0Xei9J20B5AIdPbeL3AaTBZ4N3bY0="
       }
     ]
-  }
+  },
+  "randomSig": [
+    {
+      "description": "check that signatures extra data argument is passed correctly",
+      "wif": "5KYZdUEo39z3FPrtuX2QbbwGnNP5zTd7yyr2SC1j299sBCnWjss",
+      "message": "vires is numeris",
+      "signatures": [
+        {
+          "sigData": "1Vc1E/K7DPDACw64fCoeFFKC2+W4KwLxnycBcTCoqsU=",
+          "signature": "HMzQ6VfHpu+frKdemK6xcxpJaCLp0xNlpAzsAGPWZhMKE3i1nDLveuFOjPZ4vk20Y7wP4rJ6rJWvCNJ0EZRoGZ0="
+        },
+        {
+          "sigData": "eMC2QibQm2Rti7rDulocpIPEEKB5DJEzMPyCRW+1Qwc=",
+          "signature": "G9b9KZWgwjh3Ye5z3p+JMNrgZFaMl6QZVwYHuOQcKUSEXYh8a8lrV2/AFlc31+O181Xrj2iZ62YFFgZDl1GsDh0="
+        }
+      ]
+    }
+  ]
 }

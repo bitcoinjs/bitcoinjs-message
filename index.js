@@ -44,9 +44,13 @@ function magicHash (message, messagePrefix) {
   return hash256(buffer)
 }
 
-function sign (message, privateKey, compressed, messagePrefix) {
+function sign (message, privateKey, compressed, messagePrefix, sigOptions) {
+  if ((typeof messagePrefix) === 'object' && sigOptions === undefined) {
+    sigOptions = messagePrefix
+    messagePrefix = undefined
+  }
   var hash = magicHash(message, messagePrefix)
-  var sigObj = secp256k1.sign(hash, privateKey)
+  var sigObj = secp256k1.sign(hash, privateKey, sigOptions)
   return encodeSignature(sigObj.signature, sigObj.recovery, compressed)
 }
 
