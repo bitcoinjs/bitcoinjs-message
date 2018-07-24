@@ -45,7 +45,7 @@ function magicHash (message, messagePrefix) {
 }
 
 function sign (message, privateKey, compressed, messagePrefix, sigOptions) {
-  if ((typeof messagePrefix) === 'object' && sigOptions === undefined) {
+  if (typeof messagePrefix === 'object' && sigOptions === undefined) {
     sigOptions = messagePrefix
     messagePrefix = undefined
   }
