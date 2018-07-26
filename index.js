@@ -3,6 +3,7 @@ var bufferEquals = require('buffer-equals')
 var createHash = require('create-hash')
 var secp256k1 = require('secp256k1')
 var varuint = require('varuint-bitcoin')
+var Buffer = require('safe-buffer').Buffer
 
 function sha256 (b) {
   return createHash('sha256').update(b).digest()
