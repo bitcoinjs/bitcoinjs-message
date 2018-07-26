@@ -1,6 +1,7 @@
 var test = require('tape').test
 var bitcoin = require('bitcoinjs-lib')
 var BigInteger = require('bigi')
+var Buffer = require('safe-buffer').Buffer
 var message = require('../')
 
 var fixtures = require('./fixtures.json')

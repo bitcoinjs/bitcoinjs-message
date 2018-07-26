@@ -30,6 +30,7 @@
     "bs58check": "^2.0.2",
     "buffer-equals": "^1.0.3",
     "create-hash": "^1.1.2",
+    "safe-buffer": "^5.1.2",
     "secp256k1": "^3.0.1",
     "varuint-bitcoin": "^1.0.1"
   },
