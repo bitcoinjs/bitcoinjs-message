@@ -107,7 +107,7 @@
     "signature": [
       {
         "exception": "Invalid signature parameter",
-        "hex": "23987ceade6a304fc5823ab38f99fc3c5f772a2d3e89ea05931e2726105fc53b9e601fc3231f35962c714fcbce5c95b427496edc7ae8b3d12e93791d7629795b62"
+        "hex": "2b987ceade6a304fc5823ab38f99fc3c5f772a2d3e89ea05931e2726105fc53b9e601fc3231f35962c714fcbce5c95b427496edc7ae8b3d12e93791d7629795b62"
       },
       {
         "exception": "Invalid signature length",
