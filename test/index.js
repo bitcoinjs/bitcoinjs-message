@@ -28,6 +28,17 @@ fixtures.valid.sign.forEach(function (f) {
       t.same(signature.toString('base64'), f.compressed.signature)
     }
 
+    if (f.segwit) {
+      if (f.segwit.base58) {
+        signature = message.sign(f.message, pk, true, getMessagePrefix(f.network), 'base58')
+        t.same(signature.toString('base64'), f.segwit.base58.signature)
+      }
+      if (f.segwit.bech32) {
+        signature = message.sign(f.message, pk, true, getMessagePrefix(f.network), 'bech32')
+        t.same(signature.toString('base64'), f.segwit.bech32.signature)
+      }
+    }
+
     t.end()
   })
 })
@@ -43,6 +54,15 @@ fixtures.valid.verify.forEach(function (f) {
 
     if (f.compressed) {
       t.true(message.verify(f.message, f.compressed.address, f.compressed.signature, getMessagePrefix(f.network)))
+    }
+
+    if (f.segwit) {
+      if (f.segwit.base58) {
+        t.true(message.verify(f.message, f.segwit.base58.address, f.segwit.base58.signature, getMessagePrefix(f.network)))
+      }
+      if (f.segwit.bech32) {
+        t.true(message.verify(f.message, f.segwit.bech32.address, f.segwit.bech32.signature, getMessagePrefix(f.network)))
+      }
     }
 
     t.end()
