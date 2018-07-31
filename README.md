@@ -12,7 +12,7 @@ var bitcoin = require('bitcoinjs-lib') // v3.x.x
 var bitcoinMessage = require('bitcoinjs-message')
 ```
 
-> sign(message, privateKey, compressed[, network.messagePrefix])
+> sign(message, privateKey, compressed[, network.messagePrefix, segwitType])
 
 Sign a Bitcoin message
 ``` javascript
@@ -23,6 +23,19 @@ var message = 'This is an example of a signed message.'
 var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed)
 console.log(signature.toString('base64'))
 // => 'G9L5yLFjti0QTHhPyFrZCT1V/MMnBtXKmoiKDZ78NDBjERki6ZTQZdSMCtkgoNmp17By9ItJr8o7ChX0XxY91nk='
+```
+
+Sign a Bitcoin message (with segwit addresses)
+``` javascript
+// P2SH(P2WPKH) address 'base58'
+var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed, null, 'base58')
+console.log(signature.toString('base64'))
+// => 'I9L5yLFjti0QTHhPyFrZCT1V/MMnBtXKmoiKDZ78NDBjERki6ZTQZdSMCtkgoNmp17By9ItJr8o7ChX0XxY91nk='
+
+// P2WPKH address 'bech32'
+var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed, null, 'bech32')
+console.log(signature.toString('base64'))
+// => 'J9L5yLFjti0QTHhPyFrZCT1V/MMnBtXKmoiKDZ78NDBjERki6ZTQZdSMCtkgoNmp17By9ItJr8o7ChX0XxY91nk='
 ```
 
 > verify(message, address, signature[, network.messagePrefix])
