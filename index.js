@@ -52,6 +52,9 @@ function magicHash (message, messagePrefix) {
 }
 
 function sign (message, privateKey, compressed, messagePrefix, segwitType) {
+  if (segwitType && segwitType !== 'base58' && segwitType !== 'bech32') {
+    throw new Error('Unrecognized segwitType: use "base58" or "bech32"')
+  }
   var hash = magicHash(message, messagePrefix)
   var sigObj = secp256k1.sign(hash, privateKey)
   return encodeSignature(sigObj.signature, sigObj.recovery, compressed, segwitType)
