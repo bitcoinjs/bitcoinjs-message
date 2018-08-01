@@ -29,13 +29,13 @@ fixtures.valid.sign.forEach(function (f) {
     }
 
     if (f.segwit) {
-      if (f.segwit.base58) {
-        signature = message.sign(f.message, pk, true, getMessagePrefix(f.network), 'base58')
-        t.same(signature.toString('base64'), f.segwit.base58.signature)
+      if (f.segwit.P2SH_P2WPKH) {
+        signature = message.sign(f.message, pk, true, getMessagePrefix(f.network), 'p2wpkh-in-p2sh')
+        t.same(signature.toString('base64'), f.segwit.P2SH_P2WPKH.signature)
       }
-      if (f.segwit.bech32) {
-        signature = message.sign(f.message, pk, true, getMessagePrefix(f.network), 'bech32')
-        t.same(signature.toString('base64'), f.segwit.bech32.signature)
+      if (f.segwit.P2WPKH) {
+        signature = message.sign(f.message, pk, true, getMessagePrefix(f.network), 'p2wpkh')
+        t.same(signature.toString('base64'), f.segwit.P2WPKH.signature)
       }
     }
 
@@ -57,11 +57,11 @@ fixtures.valid.verify.forEach(function (f) {
     }
 
     if (f.segwit) {
-      if (f.segwit.base58) {
-        t.true(message.verify(f.message, f.segwit.base58.address, f.segwit.base58.signature, getMessagePrefix(f.network)))
+      if (f.segwit.P2SH_P2WPKH) {
+        t.true(message.verify(f.message, f.segwit.P2SH_P2WPKH.address, f.segwit.P2SH_P2WPKH.signature, getMessagePrefix(f.network)))
       }
-      if (f.segwit.bech32) {
-        t.true(message.verify(f.message, f.segwit.bech32.address, f.segwit.bech32.signature, getMessagePrefix(f.network)))
+      if (f.segwit.P2WPKH) {
+        t.true(message.verify(f.message, f.segwit.P2WPKH.address, f.segwit.P2WPKH.signature, getMessagePrefix(f.network)))
       }
     }
 

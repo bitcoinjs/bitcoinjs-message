@@ -5,6 +5,11 @@ var createHash = require('create-hash')
 var secp256k1 = require('secp256k1')
 var varuint = require('varuint-bitcoin')
 
+var SEGWIT_TYPES = {
+  P2WPKH: 'p2wpkh',
+  P2SH_P2WPKH: 'p2wpkh-in-p2sh'
+}
+
 function sha256 (b) {
   return createHash('sha256').update(b).digest()
 }
@@ -18,7 +23,7 @@ function hash160 (buffer) {
 function encodeSignature (signature, recovery, compressed, segwitType) {
   if (segwitType !== undefined) {
     recovery += 8
-    if (segwitType === 'bech32') recovery += 4
+    if (segwitType === SEGWIT_TYPES.P2WPKH) recovery += 4
   } else {
     if (compressed) recovery += 4
   }
@@ -33,7 +38,7 @@ function decodeSignature (buffer) {
 
   return {
     compressed: !!(flagByte & 12),
-    segwitType: !(flagByte & 8) ? null : (!(flagByte & 4) ? 'base58' : 'bech32'),
+    segwitType: !(flagByte & 8) ? null : (!(flagByte & 4) ? SEGWIT_TYPES.P2SH_P2WPKH : SEGWIT_TYPES.P2WPKH),
     recovery: flagByte & 3,
     signature: buffer.slice(1)
   }
@@ -52,8 +57,13 @@ function magicHash (message, messagePrefix) {
 }
 
 function sign (message, privateKey, compressed, messagePrefix, segwitType) {
-  if (segwitType && segwitType !== 'base58' && segwitType !== 'bech32') {
-    throw new Error('Unrecognized segwitType: use "base58" or "bech32"')
+  if (segwitType && (typeof segwitType === 'string' || segwitType instanceof String)) {
+    segwitType = segwitType.toLowerCase()
+  }
+  if (segwitType && segwitType !== SEGWIT_TYPES.P2SH_P2WPKH && segwitType !== SEGWIT_TYPES.P2WPKH) {
+    throw new Error('Unrecognized segwitType: use "' +
+                    SEGWIT_TYPES.P2SH_P2WPKH + '" or "' +
+                    SEGWIT_TYPES.P2WPKH + '"')
   }
   var hash = magicHash(message, messagePrefix)
   var sigObj = secp256k1.sign(hash, privateKey)
@@ -70,12 +80,12 @@ function verify (message, address, signature, messagePrefix) {
   var actual, expected
 
   if (parsed.segwitType) {
-    if (parsed.segwitType === 'base58') {
+    if (parsed.segwitType === SEGWIT_TYPES.P2SH_P2WPKH) {
       var redeemScript = Buffer.concat([Buffer.from('0014', 'hex'), publicKeyHash])
       var redeemScriptHash = hash160(redeemScript)
       actual = redeemScriptHash
       expected = bs58check.decode(address).slice(1)
-    } else if (parsed.segwitType === 'bech32') {
+    } else if (parsed.segwitType === SEGWIT_TYPES.P2WPKH) {
       var result = bech32.decode(address)
       var data = bech32.fromWords(result.words.slice(1))
       actual = publicKeyHash

@@ -27,13 +27,13 @@ console.log(signature.toString('base64'))
 
 Sign a Bitcoin message (with segwit addresses)
 ``` javascript
-// P2SH(P2WPKH) address 'base58'
-var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed, null, 'base58')
+// P2SH(P2WPKH) address 'p2wpkh-in-p2sh'
+var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed, null, 'p2wpkh-in-p2sh')
 console.log(signature.toString('base64'))
 // => 'I9L5yLFjti0QTHhPyFrZCT1V/MMnBtXKmoiKDZ78NDBjERki6ZTQZdSMCtkgoNmp17By9ItJr8o7ChX0XxY91nk='
 
-// P2WPKH address 'bech32'
-var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed, null, 'bech32')
+// P2WPKH address 'p2wpkh'
+var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed, null, 'p2wpkh')
 console.log(signature.toString('base64'))
 // => 'J9L5yLFjti0QTHhPyFrZCT1V/MMnBtXKmoiKDZ78NDBjERki6ZTQZdSMCtkgoNmp17By9ItJr8o7ChX0XxY91nk='
 ```
