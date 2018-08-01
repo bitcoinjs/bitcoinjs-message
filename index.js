@@ -7,7 +7,7 @@ var varuint = require('varuint-bitcoin')
 
 var SEGWIT_TYPES = {
   P2WPKH: 'p2wpkh',
-  P2SH_P2WPKH: 'p2wpkh-in-p2sh'
+  P2SH_P2WPKH: 'p2sh(p2wpkh)'
 }
 
 function sha256 (b) {

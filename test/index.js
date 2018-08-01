@@ -30,7 +30,7 @@ fixtures.valid.sign.forEach(function (f) {
 
     if (f.segwit) {
       if (f.segwit.P2SH_P2WPKH) {
-        signature = message.sign(f.message, pk, true, getMessagePrefix(f.network), 'p2wpkh-in-p2sh')
+        signature = message.sign(f.message, pk, true, getMessagePrefix(f.network), 'p2sh(p2wpkh)')
         t.same(signature.toString('base64'), f.segwit.P2SH_P2WPKH.signature)
       }
       if (f.segwit.P2WPKH) {
