@@ -14,26 +14,36 @@ var bitcoinMessage = require('bitcoinjs-message')
 
 > sign(message, privateKey, compressed[, network.messagePrefix])
 
-Sign a Bitcoin message
+Sign a Dogecoin message
 ``` javascript
-var keyPair = bitcoin.ECPair.fromWIF('5KYZdUEo39z3FPrtuX2QbbwGnNP5zTd7yyr2SC1j299sBCnWjss')
-var privateKey = keyPair.d.toBuffer(32)
-var message = 'This is an example of a signed message.'
 
-var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed)
-console.log(signature.toString('base64'))
-// => 'G9L5yLFjti0QTHhPyFrZCT1V/MMnBtXKmoiKDZ78NDBjERki6ZTQZdSMCtkgoNmp17By9ItJr8o7ChX0XxY91nk='
+var dogecoinNetwork =   {
+    messagePrefix: '\x19Dogecoin Signed Message:\n',
+    bip32: {
+      public: 0x02facafd,
+      private: 0x02fac398
+    },
+    pubKeyHash: 0x1e,
+    scriptHash: 0x16,
+    wif: 0x9e
+  }
+
+var keyPair = bitcoin.ECPair.fromWIF('6Kq3vjVfdF5TwFBZ9r1yZAPYtKSxotvm45EXjxkwR5p3aNb4DKX', dogecoinNetwork);
+var privateKey = keyPair.__d;
+var message = 'This is an example of a dogecoin signed message.';
+
+var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed);
+console.log(signature.toString('base64'));
+// => HCo9HyAmfVmLnEfTvsB+kwr+j9LbWV1lOwPKi2OpOaOBOxkOnUTXjx5o2cURRPe88vYHa4AKyVjJLR9zoEB90Rs=
 ```
 
-> verify(message, address, signature[, network.messagePrefix])
+> verify(message, address, signature[, network.messagePrefix]);
 
-Verify a Bitcoin message
+Verify a Dogecoin message
 ``` javascript
-var address = '1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN'
-var signature = 'HJLQlDWLyb1Ef8bQKEISzFbDAKctIlaqOpGbrk3YVtRsjmC61lpE5ErkPRUFtDKtx98vHFGUWlFhsh3DiW6N0rE'
-var message = 'This is an example of a signed message.'
+var address = 'DTAbymNwBLCHiCcwD2oToaKX6ZVgUQ2b2g';
 
-console.log(bitcoinMessage.verify(message, address, signature))
+console.log(bitcoinMessage.verify(message, address, signature));
 // => true
 ```
 
