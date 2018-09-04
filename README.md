@@ -17,7 +17,7 @@ var bitcoinMessage = require('bitcoinjs-message')
 Sign a Bitcoin message
 ``` javascript
 var keyPair = bitcoin.ECPair.fromWIF('5KYZdUEo39z3FPrtuX2QbbwGnNP5zTd7yyr2SC1j299sBCnWjss')
-var privateKey = keyPair.d.toBuffer(32)
+var privateKey = keyPair.privateKey
 var message = 'This is an example of a signed message.'
 
 var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed)
@@ -30,8 +30,6 @@ console.log(signature.toString('base64'))
 Verify a Bitcoin message
 ``` javascript
 var address = '1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN'
-var signature = 'HJLQlDWLyb1Ef8bQKEISzFbDAKctIlaqOpGbrk3YVtRsjmC61lpE5ErkPRUFtDKtx98vHFGUWlFhsh3DiW6N0rE'
-var message = 'This is an example of a signed message.'
 
 console.log(bitcoinMessage.verify(message, address, signature))
 // => true
