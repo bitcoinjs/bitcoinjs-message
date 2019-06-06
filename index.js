@@ -23,7 +23,7 @@ function decodeSignature (buffer) {
   if (buffer.length !== 65) throw new Error('Invalid signature length')
 
   var flagByte = buffer.readUInt8(0) - 27
-  if (flagByte > 7) throw new Error('Invalid signature parameter')
+  if (flagByte > 7 || flagByte < 0) throw new Error('Invalid signature parameter')
 
   return {
     compressed: !!(flagByte & 4),
