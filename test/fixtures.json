@@ -67,13 +67,21 @@
     ],
     "sign": [
       {
-        "description": "gives equal r, s values irrespective of point compression",
+        "description": "gives equal r, s values irrespective of point compression or segwit type",
         "message": "vires is numeris",
         "network": "bitcoin",
         "d": "1",
         "signature": "HF8nHqFr3K2UKYahhX3soVeoW8W1ECNbr0wfck7lzyXjCS5Q16Ek45zyBuy1Fiy9sTPKVgsqqOuPvbycuVSSVl8=",
         "compressed": {
           "signature": "IF8nHqFr3K2UKYahhX3soVeoW8W1ECNbr0wfck7lzyXjCS5Q16Ek45zyBuy1Fiy9sTPKVgsqqOuPvbycuVSSVl8="
+        },
+        "segwit": {
+          "P2SH_P2WPKH": {
+            "signature": "JF8nHqFr3K2UKYahhX3soVeoW8W1ECNbr0wfck7lzyXjCS5Q16Ek45zyBuy1Fiy9sTPKVgsqqOuPvbycuVSSVl8="
+          },
+          "P2WPKH": {
+            "signature": "KF8nHqFr3K2UKYahhX3soVeoW8W1ECNbr0wfck7lzyXjCS5Q16Ek45zyBuy1Fiy9sTPKVgsqqOuPvbycuVSSVl8="
+          }
         }
       },
       {
@@ -93,6 +101,16 @@
         "compressed": {
           "address": "1PMycacnJaSqwwJqjawXBErnLsZ7RkXUAs",
           "signature": "H8JawPtQOrybrSP1WHQnQPr67B9S3qrxBrl1mlzoTJOSHEpmnF7D3+t+LX0Xei9J20B5AIdPbeL3AaTBZ4N3bY0="
+        },
+        "segwit": {
+          "P2SH_P2WPKH": {
+            "address": "3JvL6Ymt8MVWiCNHC7oWU6nLeHNJKLZGLN",
+            "signature": "JF8nHqFr3K2UKYahhX3soVeoW8W1ECNbr0wfck7lzyXjCS5Q16Ek45zyBuy1Fiy9sTPKVgsqqOuPvbycuVSSVl8="
+          },
+          "P2WPKH": {
+            "address": "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+            "signature": "KF8nHqFr3K2UKYahhX3soVeoW8W1ECNbr0wfck7lzyXjCS5Q16Ek45zyBuy1Fiy9sTPKVgsqqOuPvbycuVSSVl8="
+          }
         }
       },
       {
@@ -107,7 +125,7 @@
     "signature": [
       {
         "exception": "Invalid signature parameter",
-        "hex": "23987ceade6a304fc5823ab38f99fc3c5f772a2d3e89ea05931e2726105fc53b9e601fc3231f35962c714fcbce5c95b427496edc7ae8b3d12e93791d7629795b62"
+        "hex": "2b987ceade6a304fc5823ab38f99fc3c5f772a2d3e89ea05931e2726105fc53b9e601fc3231f35962c714fcbce5c95b427496edc7ae8b3d12e93791d7629795b62"
       },
       {
         "exception": "Invalid signature length",

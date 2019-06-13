@@ -28,6 +28,17 @@ fixtures.valid.sign.forEach(function (f) {
       t.same(signature.toString('base64'), f.compressed.signature)
     }
 
+    if (f.segwit) {
+      if (f.segwit.P2SH_P2WPKH) {
+        signature = message.sign(f.message, pk, true, getMessagePrefix(f.network), 'p2sh(p2wpkh)')
+        t.same(signature.toString('base64'), f.segwit.P2SH_P2WPKH.signature)
+      }
+      if (f.segwit.P2WPKH) {
+        signature = message.sign(f.message, pk, true, getMessagePrefix(f.network), 'p2wpkh')
+        t.same(signature.toString('base64'), f.segwit.P2WPKH.signature)
+      }
+    }
+
     t.end()
   })
 })
@@ -43,6 +54,15 @@ fixtures.valid.verify.forEach(function (f) {
 
     if (f.compressed) {
       t.true(message.verify(f.message, f.compressed.address, f.compressed.signature, getMessagePrefix(f.network)))
+    }
+
+    if (f.segwit) {
+      if (f.segwit.P2SH_P2WPKH) {
+        t.true(message.verify(f.message, f.segwit.P2SH_P2WPKH.address, f.segwit.P2SH_P2WPKH.signature, getMessagePrefix(f.network)))
+      }
+      if (f.segwit.P2WPKH) {
+        t.true(message.verify(f.message, f.segwit.P2WPKH.address, f.segwit.P2WPKH.signature, getMessagePrefix(f.network)))
+      }
     }
 
     t.end()
