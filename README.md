@@ -12,7 +12,11 @@ var bitcoin = require('bitcoinjs-lib') // v3.x.x
 var bitcoinMessage = require('bitcoinjs-message')
 ```
 
-> sign(message, privateKey, compressed[, network.messagePrefix, segwitType])
+> sign(message, privateKey, compressed[, network.messagePrefix, sigOptions])
+> - If you pass the sigOptions arg instead of messagePrefix it will dynamically replace.
+> - sigOptions contains two attributes
+>   - `segwitType` should be one of `'p2sh(p2wpkh)'` or `'p2wpkh'`
+>   - `extraEntropy` will be used to create non-deterministic signatures using the RFC6979 extra entropy parameter. R value reuse is not an issue.
 
 Sign a Bitcoin message
 ``` javascript
@@ -32,7 +36,7 @@ var keyPair = bitcoin.ECPair.fromWIF('5KYZdUEo39z3FPrtuX2QbbwGnNP5zTd7yyr2SC1j29
 var privateKey = keyPair.privateKey
 var message = 'This is an example of a signed message.'
 
-var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed, null, null, {data: randomBytes(32)})
+var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed, { extraEntropy: randomBytes(32) })
 console.log(signature.toString('base64'))
 // => different (but valid) signature each time
 ```
@@ -40,12 +44,12 @@ console.log(signature.toString('base64'))
 Sign a Bitcoin message (with segwit addresses)
 ``` javascript
 // P2SH(P2WPKH) address 'p2sh(p2wpkh)'
-var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed, null, 'p2sh(p2wpkh)')
+var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed, { segwitType: 'p2sh(p2wpkh)' })
 console.log(signature.toString('base64'))
 // => 'I9L5yLFjti0QTHhPyFrZCT1V/MMnBtXKmoiKDZ78NDBjERki6ZTQZdSMCtkgoNmp17By9ItJr8o7ChX0XxY91nk='
 
 // P2WPKH address 'p2wpkh'
-var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed, null, 'p2wpkh')
+var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed, { segwitType: 'p2wpkh' })
 console.log(signature.toString('base64'))
 // => 'J9L5yLFjti0QTHhPyFrZCT1V/MMnBtXKmoiKDZ78NDBjERki6ZTQZdSMCtkgoNmp17By9ItJr8o7ChX0XxY91nk='
 ```

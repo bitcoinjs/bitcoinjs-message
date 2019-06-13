@@ -75,9 +75,13 @@ function sign (
   privateKey,
   compressed,
   messagePrefix,
-  segwitType,
   sigOptions
 ) {
+  if (typeof messagePrefix === 'object' && sigOptions === undefined) {
+    sigOptions = messagePrefix
+    messagePrefix = undefined
+  }
+  let { segwitType, extraEntropy } = sigOptions || {}
   if (
     segwitType &&
     (typeof segwitType === 'string' || segwitType instanceof String)
@@ -98,7 +102,7 @@ function sign (
     )
   }
   const hash = magicHash(message, messagePrefix)
-  const sigObj = secp256k1.sign(hash, privateKey, sigOptions)
+  const sigObj = secp256k1.sign(hash, privateKey, { data: extraEntropy })
   return encodeSignature(
     sigObj.signature,
     sigObj.recovery,

@@ -43,7 +43,7 @@ fixtures.valid.sign.forEach(f => {
           pk,
           true,
           getMessagePrefix(f.network),
-          'p2sh(p2wpkh)'
+          { segwitType: 'p2sh(p2wpkh)' }
         )
         t.same(signature.toString('base64'), f.segwit.P2SH_P2WPKH.signature)
       }
@@ -53,7 +53,7 @@ fixtures.valid.sign.forEach(f => {
           pk,
           true,
           getMessagePrefix(f.network),
-          'p2wpkh'
+          { segwitType: 'p2wpkh' }
         )
         t.same(signature.toString('base64'), f.segwit.P2WPKH.signature)
       }
@@ -153,9 +153,7 @@ fixtures.randomSig.forEach(f => {
         f.message,
         privateKey,
         keyPair.compressed,
-        undefined,
-        undefined,
-        { data: Buffer.from(s.sigData, 'base64') }
+        { extraEntropy: Buffer.from(s.sigData, 'base64') }
       )
       t.true(message.verify(f.message, address, signature))
     })
