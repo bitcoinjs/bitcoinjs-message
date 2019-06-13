@@ -37,8 +37,8 @@
   "devDependencies": {
     "bigi": "^1.4.1",
     "bitcoinjs-lib": "^3.2.0",
-    "nyc": "^11.2.1",
-    "standard": "*",
+    "nyc": "^14.1.1",
+    "standard": "^12.0.1",
     "tape": "^4.5.1"
   },
   "engines": {

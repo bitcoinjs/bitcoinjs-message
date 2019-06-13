@@ -1,23 +1,27 @@
-var bs58check = require('bs58check')
-var bech32 = require('bech32')
-var bufferEquals = require('buffer-equals')
-var createHash = require('create-hash')
-var secp256k1 = require('secp256k1')
-var varuint = require('varuint-bitcoin')
+const bs58check = require('bs58check')
+const bech32 = require('bech32')
+const bufferEquals = require('buffer-equals')
+const createHash = require('create-hash')
+const secp256k1 = require('secp256k1')
+const varuint = require('varuint-bitcoin')
 
-var SEGWIT_TYPES = {
+const SEGWIT_TYPES = {
   P2WPKH: 'p2wpkh',
   P2SH_P2WPKH: 'p2sh(p2wpkh)'
 }
 
 function sha256 (b) {
-  return createHash('sha256').update(b).digest()
+  return createHash('sha256')
+    .update(b)
+    .digest()
 }
 function hash256 (buffer) {
   return sha256(sha256(buffer))
 }
 function hash160 (buffer) {
-  return createHash('ripemd160').update(sha256(buffer)).digest()
+  return createHash('ripemd160')
+    .update(sha256(buffer))
+    .digest()
 }
 
 function encodeSignature (signature, recovery, compressed, segwitType) {
@@ -33,12 +37,18 @@ function encodeSignature (signature, recovery, compressed, segwitType) {
 function decodeSignature (buffer) {
   if (buffer.length !== 65) throw new Error('Invalid signature length')
 
-  var flagByte = buffer.readUInt8(0) - 27
-  if (flagByte > 15 || flagByte < 0) throw new Error('Invalid signature parameter')
+  const flagByte = buffer.readUInt8(0) - 27
+  if (flagByte > 15 || flagByte < 0) {
+    throw new Error('Invalid signature parameter')
+  }
 
   return {
     compressed: !!(flagByte & 12),
-    segwitType: !(flagByte & 8) ? null : (!(flagByte & 4) ? SEGWIT_TYPES.P2SH_P2WPKH : SEGWIT_TYPES.P2WPKH),
+    segwitType: !(flagByte & 8)
+      ? null
+      : !(flagByte & 4)
+        ? SEGWIT_TYPES.P2SH_P2WPKH
+        : SEGWIT_TYPES.P2WPKH,
     recovery: flagByte & 3,
     signature: buffer.slice(1)
   }
@@ -46,48 +56,83 @@ function decodeSignature (buffer) {
 
 function magicHash (message, messagePrefix) {
   messagePrefix = messagePrefix || '\u0018Bitcoin Signed Message:\n'
-  if (!Buffer.isBuffer(messagePrefix)) messagePrefix = Buffer.from(messagePrefix, 'utf8')
+  if (!Buffer.isBuffer(messagePrefix)) {
+    messagePrefix = Buffer.from(messagePrefix, 'utf8')
+  }
 
-  var messageVISize = varuint.encodingLength(message.length)
-  var buffer = Buffer.allocUnsafe(messagePrefix.length + messageVISize + message.length)
+  const messageVISize = varuint.encodingLength(message.length)
+  const buffer = Buffer.allocUnsafe(
+    messagePrefix.length + messageVISize + message.length
+  )
   messagePrefix.copy(buffer, 0)
   varuint.encode(message.length, buffer, messagePrefix.length)
   buffer.write(message, messagePrefix.length + messageVISize)
   return hash256(buffer)
 }
 
-function sign (message, privateKey, compressed, messagePrefix, segwitType, sigOptions) {
-  if (segwitType && (typeof segwitType === 'string' || segwitType instanceof String)) {
+function sign (
+  message,
+  privateKey,
+  compressed,
+  messagePrefix,
+  segwitType,
+  sigOptions
+) {
+  if (
+    segwitType &&
+    (typeof segwitType === 'string' || segwitType instanceof String)
+  ) {
     segwitType = segwitType.toLowerCase()
   }
-  if (segwitType && segwitType !== SEGWIT_TYPES.P2SH_P2WPKH && segwitType !== SEGWIT_TYPES.P2WPKH) {
-    throw new Error('Unrecognized segwitType: use "' +
-                    SEGWIT_TYPES.P2SH_P2WPKH + '" or "' +
-                    SEGWIT_TYPES.P2WPKH + '"')
+  if (
+    segwitType &&
+    segwitType !== SEGWIT_TYPES.P2SH_P2WPKH &&
+    segwitType !== SEGWIT_TYPES.P2WPKH
+  ) {
+    throw new Error(
+      'Unrecognized segwitType: use "' +
+        SEGWIT_TYPES.P2SH_P2WPKH +
+        '" or "' +
+        SEGWIT_TYPES.P2WPKH +
+        '"'
+    )
   }
-  var hash = magicHash(message, messagePrefix)
-  var sigObj = secp256k1.sign(hash, privateKey, sigOptions)
-  return encodeSignature(sigObj.signature, sigObj.recovery, compressed, segwitType)
+  const hash = magicHash(message, messagePrefix)
+  const sigObj = secp256k1.sign(hash, privateKey, sigOptions)
+  return encodeSignature(
+    sigObj.signature,
+    sigObj.recovery,
+    compressed,
+    segwitType
+  )
 }
 
 function verify (message, address, signature, messagePrefix) {
   if (!Buffer.isBuffer(signature)) signature = Buffer.from(signature, 'base64')
 
-  var parsed = decodeSignature(signature)
-  var hash = magicHash(message, messagePrefix)
-  var publicKey = secp256k1.recover(hash, parsed.signature, parsed.recovery, parsed.compressed)
-  var publicKeyHash = hash160(publicKey)
-  var actual, expected
+  const parsed = decodeSignature(signature)
+  const hash = magicHash(message, messagePrefix)
+  const publicKey = secp256k1.recover(
+    hash,
+    parsed.signature,
+    parsed.recovery,
+    parsed.compressed
+  )
+  const publicKeyHash = hash160(publicKey)
+  let actual, expected
 
   if (parsed.segwitType) {
     if (parsed.segwitType === SEGWIT_TYPES.P2SH_P2WPKH) {
-      var redeemScript = Buffer.concat([Buffer.from('0014', 'hex'), publicKeyHash])
-      var redeemScriptHash = hash160(redeemScript)
+      const redeemScript = Buffer.concat([
+        Buffer.from('0014', 'hex'),
+        publicKeyHash
+      ])
+      const redeemScriptHash = hash160(redeemScript)
       actual = redeemScriptHash
       expected = bs58check.decode(address).slice(1)
     } else if (parsed.segwitType === SEGWIT_TYPES.P2WPKH) {
-      var result = bech32.decode(address)
-      var data = bech32.fromWords(result.words.slice(1))
+      const result = bech32.decode(address)
+      const data = bech32.fromWords(result.words.slice(1))
       actual = publicKeyHash
       expected = Buffer.from(data)
     }
