@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "bech32": "^1.1.3",
-    "bs58check": "^2.0.2",
+    "bs58check": "^2.1.2",
     "buffer-equals": "^1.0.3",
     "create-hash": "^1.1.2",
     "secp256k1": "^3.0.1",
@@ -37,8 +37,8 @@
   "devDependencies": {
     "bigi": "^1.4.1",
     "bitcoinjs-lib": "^3.2.0",
-    "nyc": "^11.2.1",
-    "standard": "*",
+    "nyc": "^14.1.1",
+    "standard": "^12.0.1",
     "tape": "^4.5.1"
   },
   "engines": {
