@@ -60,9 +60,19 @@
         "magicHash": "f8a5affbef4a3241b19067aa694562f64f513310817297089a8929a930f4f933"
       },
       {
+        "network": "bitcoin",
+        "message": "Virès is Numéris",
+        "magicHash": "af3d51b82a6694d76af5b49401d6f824d66cfce6f96213e606e7da95fe675f25"
+      },
+      {
         "network": "dogecoin",
         "message": "Vires is Numeris",
         "magicHash": "c0963d20d0accd0ea0df6c1020bf85a7e629a40e7b5363f2c3e9dcafd5638f12"
+      },
+      {
+        "network": "dogecoin",
+        "message": "Virès is Numéris",
+        "magicHash": "188eaf871fc659e3dd7503863fcfe051db149eb4dd8fd77ef020f099b7122b75"
       }
     ],
     "sign": [
