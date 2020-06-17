@@ -8,7 +8,7 @@
 ## Examples
 
 ``` javascript
-var bitcoin = require('bitcoinjs-lib') // v3.x.x
+var bitcoin = require('bitcoinjs-lib') // v4.x.x
 var bitcoinMessage = require('bitcoinjs-message')
 ```
 
@@ -20,7 +20,7 @@ var bitcoinMessage = require('bitcoinjs-message')
 
 Sign a Bitcoin message
 ``` javascript
-var keyPair = bitcoin.ECPair.fromWIF('5KYZdUEo39z3FPrtuX2QbbwGnNP5zTd7yyr2SC1j299sBCnWjss')
+var keyPair = bitcoin.ECPair.fromWIF('L4rK1yDtCWekvXuE6oXD9jCYfFNV2cWRpVuPLBcCU2z8TrisoyY1')
 var privateKey = keyPair.privateKey
 var message = 'This is an example of a signed message.'
 
@@ -32,7 +32,7 @@ console.log(signature.toString('base64'))
 To produce non-deterministic signatures you can pass an extra option to sign()
 ``` javascript
 var { randomBytes } = require('crypto')
-var keyPair = bitcoin.ECPair.fromWIF('5KYZdUEo39z3FPrtuX2QbbwGnNP5zTd7yyr2SC1j299sBCnWjss')
+var keyPair = bitcoin.ECPair.fromWIF('L4rK1yDtCWekvXuE6oXD9jCYfFNV2cWRpVuPLBcCU2z8TrisoyY1')
 var privateKey = keyPair.privateKey
 var message = 'This is an example of a signed message.'
 
@@ -58,7 +58,7 @@ console.log(signature.toString('base64'))
 
 Verify a Bitcoin message
 ``` javascript
-var address = '1HZwkjkeaoZfTSaJxDw6aKkxp45agDiEzN'
+var address = '1F3sAm6ZtwLAUnj7d38pGFxtP3RVEvtsbV'
 
 console.log(bitcoinMessage.verify(message, address, signature))
 // => true
