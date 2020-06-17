@@ -59,14 +59,16 @@ function magicHash (message, messagePrefix) {
   if (!Buffer.isBuffer(messagePrefix)) {
     messagePrefix = Buffer.from(messagePrefix, 'utf8')
   }
-
+  if (!Buffer.isBuffer(message)) {
+    message = Buffer.from(message, 'utf8')
+  }
   const messageVISize = varuint.encodingLength(message.length)
   const buffer = Buffer.allocUnsafe(
     messagePrefix.length + messageVISize + message.length
   )
   messagePrefix.copy(buffer, 0)
   varuint.encode(message.length, buffer, messagePrefix.length)
-  buffer.write(message, messagePrefix.length + messageVISize)
+  message.copy(buffer, messagePrefix.length + messageVISize)
   return hash256(buffer)
 }
 
