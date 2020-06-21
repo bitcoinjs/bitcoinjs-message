@@ -60,20 +60,38 @@
         "magicHash": "f8a5affbef4a3241b19067aa694562f64f513310817297089a8929a930f4f933"
       },
       {
+        "network": "bitcoin",
+        "message": "Virès is Numéris",
+        "magicHash": "af3d51b82a6694d76af5b49401d6f824d66cfce6f96213e606e7da95fe675f25"
+      },
+      {
         "network": "dogecoin",
         "message": "Vires is Numeris",
         "magicHash": "c0963d20d0accd0ea0df6c1020bf85a7e629a40e7b5363f2c3e9dcafd5638f12"
+      },
+      {
+        "network": "dogecoin",
+        "message": "Virès is Numéris",
+        "magicHash": "188eaf871fc659e3dd7503863fcfe051db149eb4dd8fd77ef020f099b7122b75"
       }
     ],
     "sign": [
       {
-        "description": "gives equal r, s values irrespective of point compression",
+        "description": "gives equal r, s values irrespective of point compression or segwit type",
         "message": "vires is numeris",
         "network": "bitcoin",
         "d": "1",
         "signature": "HF8nHqFr3K2UKYahhX3soVeoW8W1ECNbr0wfck7lzyXjCS5Q16Ek45zyBuy1Fiy9sTPKVgsqqOuPvbycuVSSVl8=",
         "compressed": {
           "signature": "IF8nHqFr3K2UKYahhX3soVeoW8W1ECNbr0wfck7lzyXjCS5Q16Ek45zyBuy1Fiy9sTPKVgsqqOuPvbycuVSSVl8="
+        },
+        "segwit": {
+          "P2SH_P2WPKH": {
+            "signature": "JF8nHqFr3K2UKYahhX3soVeoW8W1ECNbr0wfck7lzyXjCS5Q16Ek45zyBuy1Fiy9sTPKVgsqqOuPvbycuVSSVl8="
+          },
+          "P2WPKH": {
+            "signature": "KF8nHqFr3K2UKYahhX3soVeoW8W1ECNbr0wfck7lzyXjCS5Q16Ek45zyBuy1Fiy9sTPKVgsqqOuPvbycuVSSVl8="
+          }
         }
       },
       {
@@ -93,6 +111,16 @@
         "compressed": {
           "address": "1PMycacnJaSqwwJqjawXBErnLsZ7RkXUAs",
           "signature": "H8JawPtQOrybrSP1WHQnQPr67B9S3qrxBrl1mlzoTJOSHEpmnF7D3+t+LX0Xei9J20B5AIdPbeL3AaTBZ4N3bY0="
+        },
+        "segwit": {
+          "P2SH_P2WPKH": {
+            "address": "3JvL6Ymt8MVWiCNHC7oWU6nLeHNJKLZGLN",
+            "signature": "JF8nHqFr3K2UKYahhX3soVeoW8W1ECNbr0wfck7lzyXjCS5Q16Ek45zyBuy1Fiy9sTPKVgsqqOuPvbycuVSSVl8="
+          },
+          "P2WPKH": {
+            "address": "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+            "signature": "KF8nHqFr3K2UKYahhX3soVeoW8W1ECNbr0wfck7lzyXjCS5Q16Ek45zyBuy1Fiy9sTPKVgsqqOuPvbycuVSSVl8="
+          }
         }
       },
       {
@@ -107,7 +135,7 @@
     "signature": [
       {
         "exception": "Invalid signature parameter",
-        "hex": "23987ceade6a304fc5823ab38f99fc3c5f772a2d3e89ea05931e2726105fc53b9e601fc3231f35962c714fcbce5c95b427496edc7ae8b3d12e93791d7629795b62"
+        "hex": "2b987ceade6a304fc5823ab38f99fc3c5f772a2d3e89ea05931e2726105fc53b9e601fc3231f35962c714fcbce5c95b427496edc7ae8b3d12e93791d7629795b62"
       },
       {
         "exception": "Invalid signature length",
@@ -144,5 +172,22 @@
         "signature": "G8JawPtQOrybrSP1WHQnQPr67B9S3qrxBrl1mlzoTJOSHEpmnF7D3+t+LX0Xei9J20B5AIdPbeL3AaTBZ4N3bY0="
       }
     ]
-  }
+  },
+  "randomSig": [
+    {
+      "description": "check that signatures extra data argument is passed correctly",
+      "wif": "5KYZdUEo39z3FPrtuX2QbbwGnNP5zTd7yyr2SC1j299sBCnWjss",
+      "message": "vires is numeris",
+      "signatures": [
+        {
+          "sigData": "1Vc1E/K7DPDACw64fCoeFFKC2+W4KwLxnycBcTCoqsU=",
+          "signature": "HMzQ6VfHpu+frKdemK6xcxpJaCLp0xNlpAzsAGPWZhMKE3i1nDLveuFOjPZ4vk20Y7wP4rJ6rJWvCNJ0EZRoGZ0="
+        },
+        {
+          "sigData": "eMC2QibQm2Rti7rDulocpIPEEKB5DJEzMPyCRW+1Qwc=",
+          "signature": "G9b9KZWgwjh3Ye5z3p+JMNrgZFaMl6QZVwYHuOQcKUSEXYh8a8lrV2/AFlc31+O181Xrj2iZ62YFFgZDl1GsDh0="
+        }
+      ]
+    }
+  ]
 }
