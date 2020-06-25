@@ -26,7 +26,7 @@ var message = 'This is an example of a signed message.'
 
 var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed)
 console.log(signature.toString('base64'))
-// => 'G9L5yLFjti0QTHhPyFrZCT1V/MMnBtXKmoiKDZ78NDBjERki6ZTQZdSMCtkgoNmp17By9ItJr8o7ChX0XxY91nk='
+// => 'H9L5yLFjti0QTHhPyFrZCT1V/MMnBtXKmoiKDZ78NDBjERki6ZTQZdSMCtkgoNmp17By9ItJr8o7ChX0XxY91nk='
 ```
 
 To produce non-deterministic signatures you can pass an extra option to sign()
