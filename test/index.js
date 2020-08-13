@@ -5,7 +5,7 @@ const message = require('../')
 
 const fixtures = require('./fixtures.json')
 
-function getMessagePrefix (networkName) {
+function getMessagePrefix(networkName) {
   return fixtures.networks[networkName]
 }
 
@@ -106,6 +106,63 @@ fixtures.valid.verify.forEach(f => {
         if (f.segwit.P2WPKH) {
           t.true(
             message.verify(
+              f.message,
+              f.segwit.P2WPKH.address,
+              f.segwit.P2WPKH.signature,
+              getMessagePrefix(f.network)
+            )
+          )
+        }
+      }
+
+      t.end()
+    }
+  )
+})
+
+fixtures.valid.recover.forEach(f => {
+  test(
+    'recovers a valid signature for "' + f.message + '" (' + f.network + ')',
+    t => {
+      t.true(
+        message.recover(
+          f.message,
+          f.address,
+          f.signature,
+          getMessagePrefix(f.network)
+        )
+      )
+
+      if (f.network === 'bitcoin') {
+        // defaults to bitcoin network
+        t.true(message.recover(f.message, f.address, f.signature))
+      }
+
+      if (f.compressed) {
+        t.true(
+          message.recover(
+            f.message,
+            f.compressed.address,
+            f.compressed.signature,
+            getMessagePrefix(f.network)
+          )
+        )
+      }
+
+      if (f.segwit) {
+        if (f.segwit.P2SH_P2WPKH) {
+          t.true(
+            message.recover(
+              f.message,
+              f.segwit.P2SH_P2WPKH.address,
+              f.segwit.P2SH_P2WPKH.signature,
+              getMessagePrefix(f.network)
+            )
+          )
+        }
+        if (f.segwit.P2WPKH) {
+          t.true(
+            message.recover(
               f.message,
               f.segwit.P2WPKH.address,
               f.segwit.P2WPKH.signature,

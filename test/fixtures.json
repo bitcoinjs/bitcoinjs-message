@@ -129,6 +129,34 @@
         "address": "DFpN6QqFfUm3gKNaxN6tNcab1FArL9cZLE",
         "signature": "H6k+dZwJ8oOei3PCSpdj603fDvhlhQ+sqaFNIDvo/bI+Xh6zyIKGzZpyud6YhZ1a5mcrwMVtTWL+VXq/hC5Zj7s="
       }
+    ],
+    "recover": [
+      {
+        "message": "vires is numeris",
+        "network": "bitcoin",
+        "address": "16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM",
+        "signature": "G8JawPtQOrybrSP1WHQnQPr67B9S3qrxBrl1mlzoTJOSHEpmnF7D3+t+LX0Xei9J20B5AIdPbeL3AaTBZ4N3bY0=",
+        "compressed": {
+          "address": "1PMycacnJaSqwwJqjawXBErnLsZ7RkXUAs",
+          "signature": "H8JawPtQOrybrSP1WHQnQPr67B9S3qrxBrl1mlzoTJOSHEpmnF7D3+t+LX0Xei9J20B5AIdPbeL3AaTBZ4N3bY0="
+        },
+        "segwit": {
+          "P2SH_P2WPKH": {
+            "address": "3JvL6Ymt8MVWiCNHC7oWU6nLeHNJKLZGLN",
+            "signature": "JF8nHqFr3K2UKYahhX3soVeoW8W1ECNbr0wfck7lzyXjCS5Q16Ek45zyBuy1Fiy9sTPKVgsqqOuPvbycuVSSVl8="
+          },
+          "P2WPKH": {
+            "address": "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+            "signature": "KF8nHqFr3K2UKYahhX3soVeoW8W1ECNbr0wfck7lzyXjCS5Q16Ek45zyBuy1Fiy9sTPKVgsqqOuPvbycuVSSVl8="
+          }
+        }
+      },
+      {
+        "message": "vires is numeris",
+        "network": "dogecoin",
+        "address": "DFpN6QqFfUm3gKNaxN6tNcab1FArL9cZLE",
+        "signature": "H6k+dZwJ8oOei3PCSpdj603fDvhlhQ+sqaFNIDvo/bI+Xh6zyIKGzZpyud6YhZ1a5mcrwMVtTWL+VXq/hC5Zj7s="
+      }
     ]
   },
   "invalid": {
