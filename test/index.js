@@ -5,7 +5,7 @@ const message = require('../')
 
 const fixtures = require('./fixtures.json')
 
-function getMessagePrefix(networkName) {
+function getMessagePrefix (networkName) {
   return fixtures.networks[networkName]
 }
 
