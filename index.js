@@ -151,6 +151,10 @@ function verify (message, address, signature, messagePrefix) {
 }
 
 function recover (message, address, signature, messagePrefix) {
+  if (!verify(message, address, signature, messagePrefix)) {
+    throw new Error('Invalid signature or address')
+  }
+
   if (!Buffer.isBuffer(signature)) signature = Buffer.from(signature, 'base64')
 
   const parsed = decodeSignature(signature)
@@ -161,34 +165,7 @@ function recover (message, address, signature, messagePrefix) {
     parsed.recovery,
     parsed.compressed
   )
-  const publicKeyHash = hash160(publicKey)
-  let actual, expected
-
-  if (parsed.segwitType) {
-    if (parsed.segwitType === SEGWIT_TYPES.P2SH_P2WPKH) {
-      const redeemScript = Buffer.concat([
-        Buffer.from('0014', 'hex'),
-        publicKeyHash
-      ])
-      const redeemScriptHash = hash160(redeemScript)
-      actual = redeemScriptHash
-      expected = bs58check.decode(address).slice(1)
-    } else if (parsed.segwitType === SEGWIT_TYPES.P2WPKH) {
-      const result = bech32.decode(address)
-      const data = bech32.fromWords(result.words.slice(1))
-      actual = publicKeyHash
-      expected = Buffer.from(data)
-    }
-  } else {
-    actual = publicKeyHash
-    expected = bs58check.decode(address).slice(1)
-  }
-
-  if (bufferEquals(actual, expected)) {
-    return publicKey.toString('hex')
-  } else {
-    throw new Error('Invalid signature')
-  }
+  return publicKey.toString('hex')
 }
 
 module.exports = {
