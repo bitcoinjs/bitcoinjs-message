@@ -1,4 +1,7 @@
 const test = require('tape').test
+const bs58check = require('bs58check')
+const bech32 = require('bech32')
+const createHash = require('create-hash')
 const bitcoin = require('bitcoinjs-lib')
 const BigInteger = require('bigi')
 const message = require('../')
@@ -102,6 +105,15 @@ fixtures.valid.verify.forEach(f => {
               getMessagePrefix(f.network)
             )
           )
+          t.true(
+            message.verify(
+              f.message,
+              f.segwit.P2SH_P2WPKH.address,
+              f.segwit.P2SH_P2WPKH.signature.replace(/^./, 'I'),
+              getMessagePrefix(f.network),
+              true
+            )
+          )
         }
         if (f.segwit.P2WPKH) {
           t.true(
@@ -110,6 +122,15 @@ fixtures.valid.verify.forEach(f => {
               f.segwit.P2WPKH.address,
               f.segwit.P2WPKH.signature,
               getMessagePrefix(f.network)
+            )
+          )
+          t.true(
+            message.verify(
+              f.message,
+              f.segwit.P2WPKH.address,
+              f.segwit.P2WPKH.signature.replace(/^./, 'I'),
+              getMessagePrefix(f.network),
+              true
             )
           )
         }
@@ -160,3 +181,63 @@ fixtures.randomSig.forEach(f => {
     t.end()
   })
 })
+
+test('Check that compressed signatures can be verified as segwit', t => {
+  const keyPair = bitcoin.ECPair.makeRandom()
+  const privateKey = keyPair.d.toBuffer(32)
+  const publicKey = keyPair.getPublicKeyBuffer()
+  const publicKeyHash = hash160(publicKey)
+  const p2shp2wpkhRedeemHash = segwitRedeemHash(publicKeyHash)
+  // get addresses (p2pkh, p2sh-p2wpkh, p2wpkh)
+  const p2pkhAddress = keyPair.getAddress()
+  const p2shp2wpkhAddress = bs58check.encode(Buffer.concat([
+    Buffer.from([5]),
+    p2shp2wpkhRedeemHash
+  ]))
+  const p2wpkhAddress = bech32.encode(
+    'bc',
+    [0].concat(bech32.toWords(publicKeyHash))
+  )
+
+  const msg = 'Sign me'
+  const signature = message.sign(msg, privateKey, true)
+
+  // Make sure it verifies
+  t.true(message.verify(msg, p2pkhAddress, signature))
+  // Make sure it verifies even with checkSegwitAlways
+  t.true(message.verify(msg, p2pkhAddress, signature, null, true))
+
+  // Check segwit addresses with true
+  t.true(message.verify(msg, p2shp2wpkhAddress, signature, null, true))
+  t.true(message.verify(msg, p2wpkhAddress, signature, null, true))
+  // Check segwit with false
+  t.true(message.verify(msg, p2shp2wpkhAddress, signature) === false)
+  t.throws(() => {
+    message.verify(msg, p2wpkhAddress, signature)
+  }, new RegExp('^Error: Non-base58 character$'))
+
+  const signatureUncompressed = message.sign(msg, privateKey, false)
+  t.throws(() => {
+    message.verify(msg, p2shp2wpkhAddress, signatureUncompressed, null, true)
+  }, new RegExp('^Error: checkSegwitAlways can only be used with a compressed pubkey signature flagbyte$'))
+
+  t.end()
+})
+
+function sha256 (b) {
+  return createHash('sha256')
+    .update(b)
+    .digest()
+}
+function hash160 (buffer) {
+  return createHash('ripemd160')
+    .update(sha256(buffer))
+    .digest()
+}
+function segwitRedeemHash (publicKeyHash) {
+  const redeemScript = Buffer.concat([
+    Buffer.from('0014', 'hex'),
+    publicKeyHash
+  ])
+  return hash160(redeemScript)
+}

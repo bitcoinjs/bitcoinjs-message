@@ -5,7 +5,7 @@
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
-## Examples
+## Examples (Note about Electrum support at the bottom)
 
 ``` javascript
 var bitcoin = require('bitcoinjs-lib') // v4.x.x
@@ -54,7 +54,7 @@ console.log(signature.toString('base64'))
 // => 'J9L5yLFjti0QTHhPyFrZCT1V/MMnBtXKmoiKDZ78NDBjERki6ZTQZdSMCtkgoNmp17By9ItJr8o7ChX0XxY91nk='
 ```
 
-> verify(message, address, signature[, network.messagePrefix])
+> verify(message, address, signature[, network.messagePrefix, checkSegwitAlways])
 
 Verify a Bitcoin message
 ``` javascript
@@ -63,5 +63,10 @@ var address = '1F3sAm6ZtwLAUnj7d38pGFxtP3RVEvtsbV'
 console.log(bitcoinMessage.verify(message, address, signature))
 // => true
 ```
+
+## About Electrum segwit signature support
+
+- For Signing: Use the non-segwit compressed signing parameters for both segwit types (p2sh-p2wpkh and p2wpkh)
+- For Verifying: Pass the checkSegwitAlways argument as true. (messagePrefix should be set to null to default to Bitcoin messagePrefix)
 
 ## LICENSE [MIT](LICENSE)
