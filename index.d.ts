@@ -1,5 +1,5 @@
 interface SignatureOptions {
-  segwitType?: string;
+  segwitType?: 'p2wpkh' | 'p2sh(p2wpkh)';
   extraEntropy?: Buffer;
 }
 
@@ -8,10 +8,18 @@ export function magicHash(
   messagePrefix?: string
 ): Buffer;
 
+// sign function is overloaded
 export function sign(
   message: string | Buffer,
   privateKey: Buffer,
   compressed?: boolean,
+  sigOptions?: SignatureOptions
+): Buffer;
+export function sign(
+  message: string | Buffer,
+  privateKey: Buffer,
+  compressed?: boolean,
+  messagePrefix?: string,
   sigOptions?: SignatureOptions
 ): Buffer;
 
