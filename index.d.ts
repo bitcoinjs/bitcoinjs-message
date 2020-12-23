@@ -12,7 +12,7 @@ export function sign(
   message: string | Buffer,
   privateKey: Buffer,
   compressed?: boolean,
-  sigOptions?: SignatureOptions
+  sigOptions?: SignatureOptions | string
 ): Buffer;
 
 export function verify(
