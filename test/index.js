@@ -224,6 +224,28 @@ test('Check that compressed signatures can be verified as segwit', t => {
   t.end()
 })
 
+test('Check that invalid segwitType fails', t => {
+  const keyPair = bitcoin.ECPair.fromWIF('L3n3e2LggPA5BuhXyBetWGhUfsEBTFe9Y6LhyAhY2mAXkA9jNE56')
+  const privateKey = keyPair.d.toBuffer(32)
+
+  t.throws(() => {
+    message.sign('Sign me', privateKey, true, { segwitType: 'XYZ' })
+  }, new RegExp('Unrecognized segwitType: use "p2sh\\(p2wpkh\\)" or "p2wpkh"'))
+
+  t.end()
+})
+
+test('Check that Buffers and wrapped Strings are accepted', t => {
+  const keyPair = bitcoin.ECPair.fromWIF('L3n3e2LggPA5BuhXyBetWGhUfsEBTFe9Y6LhyAhY2mAXkA9jNE56')
+  const privateKey = keyPair.d.toBuffer(32)
+
+  // eslint-disable-next-line no-new-wrappers
+  const sig = message.sign(Buffer.from('Sign me', 'utf8'), privateKey, true, Buffer.from([1, 2, 3, 4]), { segwitType: new String('p2wpkh') })
+  t.equals(sig.toString('hex'), '276e5e5e75196dd93bba7b98f29f944156286d94cb34c376822c6ebc93e08d7b2d177e1f2215b2879caee53f39a376cf350ffdca70df4398a12d5b5adaf3b0f0bc')
+
+  t.end()
+})
+
 function sha256 (b) {
   return createHash('sha256')
     .update(b)

@@ -150,7 +150,10 @@ function verify (message, address, signature, messagePrefix, checkSegwitAlways) 
     if (parsed.segwitType === SEGWIT_TYPES.P2SH_P2WPKH) {
       actual = segwitRedeemHash(publicKeyHash)
       expected = bs58check.decode(address).slice(1)
-    } else if (parsed.segwitType === SEGWIT_TYPES.P2WPKH) {
+    } else {
+      // parsed.segwitType === SEGWIT_TYPES.P2WPKH
+      // must be true since we only return null, P2SH_P2WPKH, or P2WPKH
+      // from the decodeSignature function.
       actual = publicKeyHash
       expected = decodeBech32(address)
     }
