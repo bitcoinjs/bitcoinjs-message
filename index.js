@@ -72,16 +72,13 @@ function magicHash (message, messagePrefix) {
   return hash256(buffer)
 }
 
-function sign (
-  message,
-  privateKey,
-  compressed,
-  messagePrefix,
+function prepareSign (
+  messagePrefixArg,
   sigOptions
 ) {
-  if (typeof messagePrefix === 'object' && sigOptions === undefined) {
-    sigOptions = messagePrefix
-    messagePrefix = undefined
+  if (typeof messagePrefixArg === 'object' && sigOptions === undefined) {
+    sigOptions = messagePrefixArg
+    messagePrefixArg = undefined
   }
   let { segwitType, extraEntropy } = sigOptions || {}
   if (
@@ -103,14 +100,68 @@ function sign (
         '"'
     )
   }
-  const hash = magicHash(message, messagePrefix)
-  const sigObj = secp256k1.sign(hash, privateKey, { data: extraEntropy })
+
+  return {
+    messagePrefixArg,
+    segwitType,
+    extraEntropy
+  }
+}
+
+function isSigner (obj) {
+  return obj && typeof obj.sign === 'function'
+}
+
+function sign (
+  message,
+  privateKey,
+  compressed,
+  messagePrefix,
+  sigOptions
+) {
+  const {
+    messagePrefixArg,
+    segwitType,
+    extraEntropy
+  } = prepareSign(messagePrefix, sigOptions)
+  const hash = magicHash(message, messagePrefixArg)
+  const sigObj = isSigner(privateKey)
+    ? privateKey.sign(hash, extraEntropy)
+    : secp256k1.sign(hash, privateKey, { data: extraEntropy })
   return encodeSignature(
     sigObj.signature,
     sigObj.recovery,
     compressed,
     segwitType
   )
+}
+
+function signAsync (
+  message,
+  privateKey,
+  compressed,
+  messagePrefix,
+  sigOptions
+) {
+  let messagePrefixArg, segwitType, extraEntropy
+  return Promise.resolve().then(() => {
+    ({
+      messagePrefixArg,
+      segwitType,
+      extraEntropy
+    } = prepareSign(messagePrefix, sigOptions))
+    const hash = magicHash(message, messagePrefixArg)
+    return isSigner(privateKey)
+      ? privateKey.sign(hash, extraEntropy)
+      : secp256k1.sign(hash, privateKey, { data: extraEntropy })
+  }).then((sigObj) => {
+    return encodeSignature(
+      sigObj.signature,
+      sigObj.recovery,
+      compressed,
+      segwitType
+    )
+  })
 }
 
 function segwitRedeemHash (publicKeyHash) {
@@ -184,5 +235,6 @@ function verify (message, address, signature, messagePrefix, checkSegwitAlways) 
 module.exports = {
   magicHash: magicHash,
   sign: sign,
+  signAsync: signAsync,
   verify: verify
 }

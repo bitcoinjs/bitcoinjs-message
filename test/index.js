@@ -4,6 +4,7 @@ const bech32 = require('bech32')
 const createHash = require('create-hash')
 const bitcoin = require('bitcoinjs-lib')
 const BigInteger = require('bigi')
+const secp256k1 = require('secp256k1')
 const message = require('../')
 
 const fixtures = require('./fixtures.json')
@@ -24,15 +25,45 @@ fixtures.valid.magicHash.forEach(f => {
 })
 
 fixtures.valid.sign.forEach(f => {
-  test('sign: ' + f.description, t => {
+  test('sign: ' + f.description, async t => {
     const pk = new bitcoin.ECPair(new BigInteger(f.d)).d.toBuffer(32)
+    const signer = (hash, ex) => secp256k1.sign(hash, pk, { data: ex })
+    const signerAsync = async (hash, ex) => secp256k1.sign(hash, pk, { data: ex })
     let signature = message.sign(
       f.message,
       pk,
       false,
       getMessagePrefix(f.network)
     )
+    let signature2 = message.sign(
+      f.message,
+      { sign: signer },
+      false,
+      getMessagePrefix(f.network)
+    )
+    let signature3 = await message.signAsync(
+      f.message,
+      { sign: signerAsync },
+      false,
+      getMessagePrefix(f.network)
+    )
+    let signature4 = await message.signAsync(
+      f.message,
+      { sign: signer },
+      false,
+      getMessagePrefix(f.network)
+    )
+    let signature5 = await message.signAsync(
+      f.message,
+      pk,
+      false,
+      getMessagePrefix(f.network)
+    )
     t.same(signature.toString('base64'), f.signature)
+    t.same(signature2.toString('base64'), f.signature)
+    t.same(signature3.toString('base64'), f.signature)
+    t.same(signature4.toString('base64'), f.signature)
+    t.same(signature5.toString('base64'), f.signature)
 
     if (f.compressed) {
       signature = message.sign(f.message, pk, true, getMessagePrefix(f.network))
