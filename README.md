@@ -54,6 +54,57 @@ console.log(signature.toString('base64'))
 // => 'J9L5yLFjti0QTHhPyFrZCT1V/MMnBtXKmoiKDZ78NDBjERki6ZTQZdSMCtkgoNmp17By9ItJr8o7ChX0XxY91nk='
 ```
 
+Sign a Bitcoin message using a Signer interface.
+``` javascript
+var keyPair = bitcoin.ECPair.fromWIF('L4rK1yDtCWekvXuE6oXD9jCYfFNV2cWRpVuPLBcCU2z8TrisoyY1')
+var privateKey = keyPair.privateKey
+var message = 'This is an example of a signed message.'
+
+var secp256k1 = require('secp256k1')
+// Notice we are using the privateKey var from the outer scope inside the sign function.
+var signer = { sign: (hash, extraData) => secp256k1.sign(hash, privateKey, { data: extraData }) }
+
+var signature = bitcoinMessage.sign(message, signer, keyPair.compressed)
+console.log(signature.toString('base64'))
+// => 'H9L5yLFjti0QTHhPyFrZCT1V/MMnBtXKmoiKDZ78NDBjERki6ZTQZdSMCtkgoNmp17By9ItJr8o7ChX0XxY91nk='
+```
+
+> signAsync(message, privateKey, compressed[, network.messagePrefix, sigOptions])
+> Same as sign, except returns a promise, and can accept a SignerAsync interface instead of privateKey
+
+Sign a Bitcoin message asynchronously
+``` javascript
+var keyPair = bitcoin.ECPair.fromWIF('L4rK1yDtCWekvXuE6oXD9jCYfFNV2cWRpVuPLBcCU2z8TrisoyY1')
+var privateKey = keyPair.privateKey
+var message = 'This is an example of a signed message.'
+
+bitcoinMessage.signAsync(message, privateKey, keyPair.compressed).then(signature => {
+  console.log(signature.toString('base64'))
+})
+// => 'H9L5yLFjti0QTHhPyFrZCT1V/MMnBtXKmoiKDZ78NDBjERki6ZTQZdSMCtkgoNmp17By9ItJr8o7ChX0XxY91nk='
+```
+
+Sign a Bitcoin message asynchronously using SignerAsync interface
+``` javascript
+var keyPair = bitcoin.ECPair.fromWIF('L4rK1yDtCWekvXuE6oXD9jCYfFNV2cWRpVuPLBcCU2z8TrisoyY1')
+var privateKey = keyPair.privateKey
+var message = 'This is an example of a signed message.'
+
+var secp256k1 = require('secp256k1')
+// Note that a Signer will also work
+var signerAsync = { sign: (hash, extraData) => Promise.resolve(secp256k1.sign(hash, privateKey, { data: extraData })) }
+var signer = { sign: (hash, extraData) => secp256k1.sign(hash, privateKey, { data: extraData }) }
+
+bitcoinMessage.signAsync(message, signerAsync, keyPair.compressed).then(signature => {
+  console.log(signature.toString('base64'))
+})
+// => 'H9L5yLFjti0QTHhPyFrZCT1V/MMnBtXKmoiKDZ78NDBjERki6ZTQZdSMCtkgoNmp17By9ItJr8o7ChX0XxY91nk='
+bitcoinMessage.signAsync(message, signer, keyPair.compressed).then(signature => {
+  console.log(signature.toString('base64'))
+})
+// => 'H9L5yLFjti0QTHhPyFrZCT1V/MMnBtXKmoiKDZ78NDBjERki6ZTQZdSMCtkgoNmp17By9ItJr8o7ChX0XxY91nk='
+```
+
 > verify(message, address, signature[, network.messagePrefix, checkSegwitAlways])
 
 Verify a Bitcoin message
