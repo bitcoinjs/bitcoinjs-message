@@ -1,11 +1,11 @@
 const test = require('tape').test
 const bs58check = require('bs58check')
-const bech32 = require('bech32')
+const xxx = require('bech32')
 const createHash = require('create-hash')
 const bitcoin = require('bitcoinjs-lib')
 const BigInteger = require('bigi')
 const secp256k1 = require('secp256k1')
-const message = require('../')
+const message = require('../src/index')
 
 const fixtures = require('./fixtures.json')
 
@@ -225,9 +225,9 @@ test('Check that compressed signatures can be verified as segwit', t => {
     Buffer.from([5]),
     p2shp2wpkhRedeemHash
   ]))
-  const p2wpkhAddress = bech32.encode(
+  const p2wpkhAddress = xxx.bech32.encode(
     'bc',
-    [0].concat(bech32.toWords(publicKeyHash))
+    [0].concat(xxx.bech32.toWords(publicKeyHash))
   )
 
   const msg = 'Sign me'
