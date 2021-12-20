@@ -4,7 +4,7 @@ import { describe, it } from 'mocha';
 import ECPairFactory from 'ecpair';
 import * as bs58check from 'bs58check';
 import { bech32 } from 'bech32';
-const bitcoin = require('bitcoinjs-lib');
+import * as bitcoinjs from 'bitcoinjs-lib'
 const BigInteger = require('bigi');
 const secp256k1 = require('secp256k1');
 const tinySecp256k1 = require('tiny-secp256k1');
@@ -238,30 +238,32 @@ describe('verify signature', () => {
 describe('verify random signature', () => {
   fixtures.randomSig.forEach((f) => {
     it(f.description, () => {
-      const keyPair = bitcoin.ECPair.fromWIF(f.wif);
-      const privateKey = keyPair.d.toBuffer(32);
-      const address = keyPair.getAddress();
+      const keyPair = ECPair.fromWIF(f.wif);
+      const address = bitcoinjs.payments.p2pkh( { pubkey: keyPair.publicKey }).address
       f.signatures.forEach((s) => {
         const signature = message.sign(
           f.message,
-          privateKey,
+          keyPair.privateKey,
           keyPair.compressed,
           { extraEntropy: Buffer.from(s.sigData, 'base64') },
         );
-        assert.strictEqual(message.verify(f.message, address, signature), true);
+        assert.strictEqual(message.verify(f.message, address!, signature), true);
       });
     });
   });
 });
 
 describe('Check that compressed signatures can be verified as segwit', () => {
-  const keyPair = bitcoin.ECPair.makeRandom();
-  const privateKey = keyPair.d.toBuffer(32);
-  const publicKey = keyPair.getPublicKeyBuffer();
-  const publicKeyHash = hash160(publicKey);
+  const keyPair = ECPair.makeRandom();
+//   const privateKey = keyPair.d.toBuffer(32);
+//   const publicKey = keyPair.getPublicKeyBuffer();
+  const publicKeyHash = hash160(keyPair.publicKey);
   const p2shp2wpkhRedeemHash = segwitRedeemHash(publicKeyHash);
+
   // get addresses (p2pkh, p2sh-p2wpkh, p2wpkh)
-  const p2pkhAddress = keyPair.getAddress();
+//   const p2pkhAddress = keyPair.getAddress();
+  const p2pkhAddress = bitcoinjs.payments.p2pkh( { pubkey: keyPair.publicKey }).address
+  
   const p2shp2wpkhAddress = bs58check.encode(
     Buffer.concat([Buffer.from([5]), p2shp2wpkhRedeemHash]),
   );
@@ -271,13 +273,13 @@ describe('Check that compressed signatures can be verified as segwit', () => {
   );
 
   const msg = 'Sign me';
-  const signature = message.sign(msg, privateKey, true);
+  const signature = message.sign(msg, keyPair.privateKey, true);
 
   // Make sure it verifies
-  assert.strictEqual(message.verify(msg, p2pkhAddress, signature), true);
+  assert.strictEqual(message.verify(msg, p2pkhAddress!, signature), true);
   // Make sure it verifies even with checkSegwitAlways
   assert.strictEqual(
-    message.verify(msg, p2pkhAddress, signature, null, true),
+    message.verify(msg, p2pkhAddress!, signature, null, true),
     true,
   );
 
@@ -300,7 +302,7 @@ describe('Check that compressed signatures can be verified as segwit', () => {
     message.verify(msg, p2wpkhAddress, signature);
   }, new RegExp('^Error: Non-base58 character$'));
 
-  const signatureUncompressed = message.sign(msg, privateKey, false);
+  const signatureUncompressed = message.sign(msg, keyPair.privateKey, false);
   assert.throws(() => {
     message.verify(msg, p2shp2wpkhAddress, signatureUncompressed, null, true);
   }, new RegExp('^Error: checkSegwitAlways can only be used with a compressed pubkey signature flagbyte$'));

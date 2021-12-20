@@ -16,7 +16,6 @@ export interface SignOptions {
   extraEntropy?: Buffer;
   messagePrefixArg?: string;
 }
-
 interface Signature {
   compressed: boolean;
   segwitType: string | null;
