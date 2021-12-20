@@ -5,15 +5,15 @@ import ECPairFactory from 'ecpair';
 import * as bs58check from 'bs58check';
 import { bech32 } from 'bech32';
 import * as bitcoinjs from 'bitcoinjs-lib';
-const BigInteger = require('bigi');
-const secp256k1 = require('secp256k1');
-const tinySecp256k1 = require('tiny-secp256k1');
-
-const ECPair = ECPairFactory(tinySecp256k1);
+import * as secp256k1 from 'secp256k1';
+import * as tinySecp256k1 from 'tiny-secp256k1';
 
 import { hash160 } from '../src/crypto';
 import * as message from '../src';
 import * as fixtures from './fixtures.json';
+
+const BigInteger = require('bigi');
+const ECPair = ECPairFactory(tinySecp256k1);
 
 function getMessagePrefix(networkName: string): string {
   //@ts-ignore
@@ -42,9 +42,9 @@ describe('sign', () => {
         new BigInteger(f.d).toBuffer(32),
       ).privateKey;
       const signer = (hash: Buffer, ex: Buffer) =>
-        secp256k1.ecdsaSign(hash, pk, { data: ex });
+        secp256k1.ecdsaSign(hash, pk!, { data: ex });
       const signerAsync = async (hash: Buffer, ex: Buffer) =>
-        secp256k1.ecdsaSign(hash, pk, { data: ex });
+        secp256k1.ecdsaSign(hash, pk!, { data: ex });
       let signature = message.sign(
         f.message,
         pk,

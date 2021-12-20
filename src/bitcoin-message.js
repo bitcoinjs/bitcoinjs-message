@@ -3,7 +3,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 exports.verify = exports.signAsync = exports.sign = exports.magicHash = void 0;
 const bs58check = require('bs58check');
 const bech32_1 = require('bech32');
-const secp256k1 = require('secp256k1'); // todo
+const secp256k1 = require('secp256k1');
 const varuint = require('varuint-bitcoin');
 const crypto_1 = require('./crypto');
 const SEGWIT_TYPES = {
@@ -160,7 +160,7 @@ function verify(message, address, signature, messagePrefix, checkSegwitAlways) {
     hash,
     parsed.compressed,
   );
-  const publicKeyHash = (0, crypto_1.hash160)(publicKey);
+  const publicKeyHash = (0, crypto_1.hash160)(Buffer.from(publicKey));
   let actual;
   let expected;
   if (parsed.segwitType) {

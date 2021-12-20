@@ -46,8 +46,7 @@
     "prettier": "prettier \"ts_src/**/*.ts\" \"test/**/*.ts\" --ignore-path ./.prettierignore",
     "prettierjs": "prettier \"src/**/*.js\" --ignore-path ./.prettierignore",
     "test": "npm run build && npm run format:ci && npm run lint && npm run nobuild:coverage",
-    "unit": "npm run build && npm run nobuild:unit",
-    "unit:old": "tape test/*.js"
+    "unit": "npm run build && npm run nobuild:unit"
   },
   "dependencies": {
     "bech32": "^2.0.0",
@@ -62,6 +61,7 @@
     "@types/create-hash": "^1.2.2",
     "@types/mocha": "^5.2.7",
     "@types/node": "^17.0.0",
+    "@types/secp256k1": "^4.0.3",
     "bigi": "^1.4.1",
     "bitcoinjs-lib": "^6.0.1",
     "ecpair": "^2.0.1",

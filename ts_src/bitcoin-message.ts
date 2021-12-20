@@ -1,6 +1,6 @@
 import * as bs58check from 'bs58check';
 import { bech32 } from 'bech32';
-const secp256k1 = require('secp256k1'); // todo
+import * as secp256k1 from 'secp256k1';
 import * as varuint from 'varuint-bitcoin';
 
 import { hash160, hash256 } from './crypto';
@@ -213,7 +213,7 @@ export function verify(
     hash,
     parsed.compressed,
   );
-  const publicKeyHash = hash160(publicKey);
+  const publicKeyHash = hash160(Buffer.from(publicKey));
   let actual;
   let expected;
 
