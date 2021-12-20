@@ -4,7 +4,6 @@ import { describe, it } from 'mocha';
 import ECPairFactory from 'ecpair';
 import * as bs58check from 'bs58check';
 import { bech32 } from 'bech32';
-// import * as createHash from 'create-hash';
 const bitcoin = require('bitcoinjs-lib');
 const BigInteger = require('bigi');
 const secp256k1 = require('secp256k1');
@@ -308,26 +307,24 @@ describe('Check that compressed signatures can be verified as segwit', () => {
 });
 
 describe('Check that invalid segwitType fails', () => {
-  const keyPair = bitcoin.ECPair.fromWIF(
+  const keyPair = ECPair.fromWIF(
     'L3n3e2LggPA5BuhXyBetWGhUfsEBTFe9Y6LhyAhY2mAXkA9jNE56',
   );
-  const privateKey = keyPair.d.toBuffer(32);
 
   assert.throws(() => {
-    message.sign('Sign me', privateKey, true, { segwitType: 'XYZ' });
+    message.sign('Sign me', keyPair.privateKey, true, { segwitType: 'XYZ' });
   }, new RegExp('Unrecognized segwitType: use "p2sh\\(p2wpkh\\)" or "p2wpkh"'));
 });
 
 describe('Check that Buffers and wrapped Strings are accepted', () => {
-  const keyPair = bitcoin.ECPair.fromWIF(
+  const keyPair = ECPair.fromWIF(
     'L3n3e2LggPA5BuhXyBetWGhUfsEBTFe9Y6LhyAhY2mAXkA9jNE56',
   );
-  const privateKey = keyPair.d.toBuffer(32);
 
   // eslint-disable-next-line no-new-wrappers
   const sig = message.sign(
     Buffer.from('Sign me', 'utf8'),
-    privateKey,
+    keyPair.privateKey,
     true,
     Buffer.from([1, 2, 3, 4]),
     { segwitType: 'p2wpkh' },
