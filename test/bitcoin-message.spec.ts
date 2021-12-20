@@ -4,7 +4,7 @@ import { describe, it } from 'mocha';
 import ECPairFactory from 'ecpair';
 import * as bs58check from 'bs58check';
 import { bech32 } from 'bech32';
-import * as bitcoinjs from 'bitcoinjs-lib'
+import * as bitcoinjs from 'bitcoinjs-lib';
 const BigInteger = require('bigi');
 const secp256k1 = require('secp256k1');
 const tinySecp256k1 = require('tiny-secp256k1');
@@ -12,11 +12,7 @@ const tinySecp256k1 = require('tiny-secp256k1');
 const ECPair = ECPairFactory(tinySecp256k1);
 
 import { hash160 } from '../src/crypto';
-
-// const message = require('../src/index');
 import * as message from '../src';
-
-// const fixtures = require('./fixtures.json');
 import * as fixtures from './fixtures.json';
 
 function getMessagePrefix(networkName: string): string {
@@ -46,9 +42,9 @@ describe('sign', () => {
         new BigInteger(f.d).toBuffer(32),
       ).privateKey;
       const signer = (hash: Buffer, ex: Buffer) =>
-        secp256k1.sign(hash, pk, { data: ex });
+        secp256k1.ecdsaSign(hash, pk, { data: ex });
       const signerAsync = async (hash: Buffer, ex: Buffer) =>
-        secp256k1.sign(hash, pk, { data: ex });
+        secp256k1.ecdsaSign(hash, pk, { data: ex });
       let signature = message.sign(
         f.message,
         pk,
@@ -239,7 +235,9 @@ describe('verify random signature', () => {
   fixtures.randomSig.forEach((f) => {
     it(f.description, () => {
       const keyPair = ECPair.fromWIF(f.wif);
-      const address = bitcoinjs.payments.p2pkh( { pubkey: keyPair.publicKey }).address
+      const address = bitcoinjs.payments.p2pkh({
+        pubkey: keyPair.publicKey,
+      }).address;
       f.signatures.forEach((s) => {
         const signature = message.sign(
           f.message,
@@ -247,7 +245,10 @@ describe('verify random signature', () => {
           keyPair.compressed,
           { extraEntropy: Buffer.from(s.sigData, 'base64') },
         );
-        assert.strictEqual(message.verify(f.message, address!, signature), true);
+        assert.strictEqual(
+          message.verify(f.message, address!, signature),
+          true,
+        );
       });
     });
   });
@@ -255,15 +256,13 @@ describe('verify random signature', () => {
 
 describe('Check that compressed signatures can be verified as segwit', () => {
   const keyPair = ECPair.makeRandom();
-//   const privateKey = keyPair.d.toBuffer(32);
-//   const publicKey = keyPair.getPublicKeyBuffer();
   const publicKeyHash = hash160(keyPair.publicKey);
   const p2shp2wpkhRedeemHash = segwitRedeemHash(publicKeyHash);
 
-  // get addresses (p2pkh, p2sh-p2wpkh, p2wpkh)
-//   const p2pkhAddress = keyPair.getAddress();
-  const p2pkhAddress = bitcoinjs.payments.p2pkh( { pubkey: keyPair.publicKey }).address
-  
+  const p2pkhAddress = bitcoinjs.payments.p2pkh({
+    pubkey: keyPair.publicKey,
+  }).address;
+
   const p2shp2wpkhAddress = bs58check.encode(
     Buffer.concat([Buffer.from([5]), p2shp2wpkhRedeemHash]),
   );

@@ -135,10 +135,10 @@ export function sign(
   const hash = magicHash(message, messagePrefixArg);
   const sigObj = isSigner(privateKey)
     ? privateKey.sign(hash, extraEntropy)
-    : secp256k1.sign(hash, privateKey, { data: extraEntropy });
+    : secp256k1.ecdsaSign(hash, privateKey, { data: extraEntropy });
   return encodeSignature(
-    sigObj.signature,
-    sigObj.recovery,
+    Buffer.from(sigObj.signature),
+    sigObj.recid,
     compressed,
     segwitType,
   );
@@ -163,12 +163,12 @@ export function signAsync(
       const hash = magicHash(message, messagePrefixArg);
       return isSigner(privateKey)
         ? privateKey.sign(hash, extraEntropy)
-        : secp256k1.sign(hash, privateKey, { data: extraEntropy });
+        : secp256k1.ecdsaSign(hash, privateKey, { data: extraEntropy });
     })
     .then((sigObj) => {
       return encodeSignature(
-        sigObj.signature,
-        sigObj.recovery,
+        Buffer.from(sigObj.signature),
+        sigObj.recid,
         compressed,
         segwitType,
       );
@@ -207,10 +207,10 @@ export function verify(
   }
 
   const hash = magicHash(message, messagePrefix);
-  const publicKey = secp256k1.recover(
-    hash,
+  const publicKey = secp256k1.ecdsaRecover(
     parsed.signature,
     parsed.recovery,
+    hash,
     parsed.compressed,
   );
   const publicKeyHash = hash160(publicKey);
@@ -238,10 +238,7 @@ export function verify(
         const redeemHash = segwitRedeemHash(publicKeyHash);
         expected = bs58check.decode(address).slice(1);
         // base58 can be p2pkh or p2sh-p2wpkh
-        return (
-          publicKeyHash.equals(expected) ||
-          redeemHash.equals(expected)
-        );
+        return publicKeyHash.equals(expected) || redeemHash.equals(expected);
       }
     } else {
       actual = publicKeyHash;
