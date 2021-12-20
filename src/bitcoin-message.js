@@ -3,7 +3,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
 exports.verify = exports.signAsync = exports.sign = exports.magicHash = void 0;
 const bs58check = require('bs58check');
 const bech32_1 = require('bech32');
-const bufferEquals = require('buffer-equals'); // todo
 const secp256k1 = require('secp256k1'); // todo
 const varuint = require('varuint-bitcoin');
 const crypto_1 = require('./crypto');
@@ -180,21 +179,18 @@ function verify(message, address, signature, messagePrefix, checkSegwitAlways) {
       try {
         expected = decodeBech32(address);
         // if address is bech32 it is not p2sh
-        return bufferEquals(publicKeyHash, expected);
+        return publicKeyHash.equals(expected);
       } catch (e) {
         const redeemHash = segwitRedeemHash(publicKeyHash);
         expected = bs58check.decode(address).slice(1);
         // base58 can be p2pkh or p2sh-p2wpkh
-        return (
-          bufferEquals(publicKeyHash, expected) ||
-          bufferEquals(redeemHash, expected)
-        );
+        return publicKeyHash.equals(expected) || redeemHash.equals(expected);
       }
     } else {
       actual = publicKeyHash;
       expected = bs58check.decode(address).slice(1);
     }
   }
-  return bufferEquals(actual, expected);
+  return actual.equals(expected);
 }
 exports.verify = verify;

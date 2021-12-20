@@ -1,6 +1,5 @@
 import * as bs58check from 'bs58check';
 import { bech32 } from 'bech32';
-const bufferEquals = require('buffer-equals'); // todo
 const secp256k1 = require('secp256k1'); // todo
 import * as varuint from 'varuint-bitcoin';
 
@@ -234,14 +233,14 @@ export function verify(
       try {
         expected = decodeBech32(address);
         // if address is bech32 it is not p2sh
-        return bufferEquals(publicKeyHash, expected);
+        return publicKeyHash.equals(expected);
       } catch (e) {
         const redeemHash = segwitRedeemHash(publicKeyHash);
         expected = bs58check.decode(address).slice(1);
         // base58 can be p2pkh or p2sh-p2wpkh
         return (
-          bufferEquals(publicKeyHash, expected) ||
-          bufferEquals(redeemHash, expected)
+          publicKeyHash.equals(expected) ||
+          redeemHash.equals(expected)
         );
       }
     } else {
@@ -250,5 +249,5 @@ export function verify(
     }
   }
 
-  return bufferEquals(actual, expected);
+  return actual.equals(expected);
 }
