@@ -4,23 +4,13 @@ exports.verify = exports.signAsync = exports.sign = exports.magicHash = void 0;
 const bs58check = require('bs58check');
 const bech32_1 = require('bech32');
 const bufferEquals = require('buffer-equals'); // todo
-const createHash = require('create-hash');
 const secp256k1 = require('secp256k1'); // todo
 const varuint = require('varuint-bitcoin');
+const crypto_1 = require('./crypto');
 const SEGWIT_TYPES = {
   P2WPKH: 'p2wpkh',
   P2SH_P2WPKH: 'p2sh(p2wpkh)',
 };
-// todo: move to crypto.ts
-function sha256(buffer) {
-  return createHash('sha256').update(buffer).digest();
-}
-function hash256(buffer) {
-  return sha256(sha256(buffer));
-}
-function hash160(buffer) {
-  return createHash('ripemd160').update(sha256(buffer)).digest();
-}
 function encodeSignature(signature, recovery, compressed, segwitType) {
   if (segwitType !== undefined) {
     recovery += 8;
@@ -62,18 +52,17 @@ function magicHash(message, messagePrefix) {
   messagePrefix.copy(buffer, 0);
   varuint.encode(message.length, buffer, messagePrefix.length);
   message.copy(buffer, messagePrefix.length + messageVISize);
-  return hash256(buffer);
+  return (0, crypto_1.hash256)(buffer);
 }
 exports.magicHash = magicHash;
-function prepareSign(
-  messagePrefixArg,
-  sigOptions, // todo
-) {
+function prepareSign(messagePrefixArg, sigOptions) {
   if (typeof messagePrefixArg === 'object' && sigOptions === undefined) {
+    // @ts-ignore
     sigOptions = messagePrefixArg;
     messagePrefixArg = undefined;
   }
-  let { segwitType, extraEntropy } = sigOptions || {};
+  let segwitType = (sigOptions || {}).segwitType;
+  const extraEntropy = sigOptions?.extraEntropy;
   if (
     segwitType &&
     (typeof segwitType === 'string' || segwitType instanceof String)
@@ -94,6 +83,7 @@ function prepareSign(
     );
   }
   return {
+    // @ts-ignore
     messagePrefixArg,
     segwitType,
     extraEntropy,
@@ -102,13 +92,7 @@ function prepareSign(
 function isSigner(obj) {
   return obj && typeof obj.sign === 'function';
 }
-function sign(
-  message,
-  privateKey,
-  compressed,
-  messagePrefix,
-  sigOptions, // todo: review all any
-) {
+function sign(message, privateKey, compressed, messagePrefix, sigOptions) {
   const { messagePrefixArg, segwitType, extraEntropy } = prepareSign(
     messagePrefix,
     sigOptions,
@@ -126,7 +110,8 @@ function sign(
 }
 exports.sign = sign;
 function signAsync(message, privateKey, compressed, messagePrefix, sigOptions) {
-  let messagePrefixArg, extraEntropy;
+  let messagePrefixArg;
+  let extraEntropy;
   let segwitType;
   return Promise.resolve()
     .then(() => {
@@ -154,7 +139,7 @@ function segwitRedeemHash(publicKeyHash) {
     Buffer.from('0014', 'hex'),
     publicKeyHash,
   ]);
-  return hash160(redeemScript);
+  return (0, crypto_1.hash160)(redeemScript);
 }
 function decodeBech32(address) {
   const result = bech32_1.bech32.decode(address);
@@ -176,8 +161,9 @@ function verify(message, address, signature, messagePrefix, checkSegwitAlways) {
     parsed.recovery,
     parsed.compressed,
   );
-  const publicKeyHash = hash160(publicKey);
-  let actual, expected;
+  const publicKeyHash = (0, crypto_1.hash160)(publicKey);
+  let actual;
+  let expected;
   if (parsed.segwitType) {
     if (parsed.segwitType === SEGWIT_TYPES.P2SH_P2WPKH) {
       actual = segwitRedeemHash(publicKeyHash);

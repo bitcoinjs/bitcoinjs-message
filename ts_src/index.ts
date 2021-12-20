@@ -1,6 +1,1 @@
-export {
-    magicHash,
-    sign,
-    signAsync,
-    verify
-} from './bitcoin-message'
+export { magicHash, sign, signAsync, verify } from './bitcoin-message';
