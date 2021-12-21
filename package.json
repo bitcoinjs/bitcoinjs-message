@@ -25,6 +25,7 @@
     "url": "https://github.com/bitcoinjs/bitcoinjs-message.git"
   },
   "scripts": {
+    "audit": "NPM_AUDIT_IGNORE_DEV=1 NPM_AUDIT_IGNORE_LEVEL=low npm-audit-whitelister .npm-audit-whitelister.json",
     "build": "npm run clean && tsc -p ./tsconfig.json && npm run formatjs",
     "build:tests": "npm run clean:jstests && tsc -p ./test/tsconfig.json",
     "clean": "rimraf src",
