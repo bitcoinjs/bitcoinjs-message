@@ -16,7 +16,7 @@ const BigInteger = require('bigi');
 const ECPair = ECPairFactory(tinySecp256k1);
 
 function getMessagePrefix(networkName: string): string {
-  //@ts-ignore
+  // @ts-ignore
   return fixtures.networks[networkName];
 }
 
@@ -51,25 +51,25 @@ describe('sign', () => {
         false,
         getMessagePrefix(f.network),
       );
-      let signature2 = message.sign(
+      const signature2 = message.sign(
         f.message,
         { sign: signer },
         false,
         getMessagePrefix(f.network),
       );
-      let signature3 = await message.signAsync(
+      const signature3 = await message.signAsync(
         f.message,
         { sign: signerAsync },
         false,
         getMessagePrefix(f.network),
       );
-      let signature4 = await message.signAsync(
+      const signature4 = await message.signAsync(
         f.message,
         { sign: signer },
         false,
         getMessagePrefix(f.network),
       );
-      let signature5 = await message.signAsync(
+      const signature5 = await message.signAsync(
         f.message,
         pk,
         false,
