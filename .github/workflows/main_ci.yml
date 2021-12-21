@@ -5,7 +5,7 @@ on:
     branches:
       - motorina0/decouple-from-secp256k1
   pull_request:
-      - branches: [ master ]
+    branches: [ master ]
 
 jobs:
   audit:
