@@ -2,8 +2,7 @@ name: Run Tests
 
 on:
   push:
-    branches:
-      - motorina0/decouple-from-secp256k1
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
