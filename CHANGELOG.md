@@ -1,3 +1,8 @@
+# 2.2.1
+ __changed__
+ - Migrated lib to TypeScript 
+ - Upgrade dependecies to latest version
+
 # 2.2.0
 __added__
 - Signer and SignerAsync interfaces
