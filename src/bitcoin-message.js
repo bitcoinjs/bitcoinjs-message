@@ -3,7 +3,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 exports.verify = exports.signAsync = exports.sign = exports.magicHash = void 0;
 const bs58check = require('bs58check');
 const bech32_1 = require('bech32');
-const secp256k1 = require('secp256k1');
+const secp256k1 = require('tiny-secp256k1');
 const varuint = require('varuint-bitcoin');
 const crypto_1 = require('./crypto');
 const SEGWIT_TYPES = {
@@ -61,7 +61,7 @@ function prepareSign(messagePrefixArg, sigOptions) {
     messagePrefixArg = undefined;
   }
   let segwitType = (sigOptions || {}).segwitType;
-  const extraEntropy = sigOptions?.extraEntropy;
+  const extraEntropy = sigOptions && sigOptions.extraEntropy;
   if (
     segwitType &&
     (typeof segwitType === 'string' || segwitType instanceof String)
@@ -99,10 +99,10 @@ function sign(message, privateKey, compressed, messagePrefix, sigOptions) {
   const hash = magicHash(message, messagePrefixArg);
   const sigObj = isSigner(privateKey)
     ? privateKey.sign(hash, extraEntropy)
-    : secp256k1.ecdsaSign(hash, privateKey, { data: extraEntropy });
+    : secp256k1.signRecoverable(hash, privateKey, extraEntropy);
   return encodeSignature(
     Buffer.from(sigObj.signature),
-    sigObj.recid,
+    sigObj.recoveryId,
     compressed,
     segwitType,
   );
@@ -121,12 +121,12 @@ function signAsync(message, privateKey, compressed, messagePrefix, sigOptions) {
       const hash = magicHash(message, messagePrefixArg);
       return isSigner(privateKey)
         ? privateKey.sign(hash, extraEntropy)
-        : secp256k1.ecdsaSign(hash, privateKey, { data: extraEntropy });
+        : secp256k1.signRecoverable(hash, privateKey, extraEntropy);
     })
     .then((sigObj) => {
       return encodeSignature(
         Buffer.from(sigObj.signature),
-        sigObj.recid,
+        sigObj.recoveryId,
         compressed,
         segwitType,
       );
@@ -154,12 +154,13 @@ function verify(message, address, signature, messagePrefix, checkSegwitAlways) {
     );
   }
   const hash = magicHash(message, messagePrefix);
-  const publicKey = secp256k1.ecdsaRecover(
+  const publicKey = secp256k1.recover(
+    hash,
     parsed.signature,
     parsed.recovery,
-    hash,
     parsed.compressed,
   );
+  if (!publicKey) throw new Error('Public key is point at infinity!');
   const publicKeyHash = (0, crypto_1.hash160)(Buffer.from(publicKey));
   let actual;
   let expected;

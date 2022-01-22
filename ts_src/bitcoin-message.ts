@@ -1,6 +1,6 @@
 import * as bs58check from 'bs58check';
 import { bech32 } from 'bech32';
-import * as secp256k1 from 'secp256k1';
+import * as secp256k1 from 'tiny-secp256k1';
 import * as varuint from 'varuint-bitcoin';
 
 import { hash160, hash256 } from './crypto';
@@ -15,10 +15,12 @@ export interface SignOptions {
   extraEntropy?: Buffer;
   messagePrefixArg?: string;
 }
+
+type RecoveryIdType = 0 | 1 | 2 | 3;
 interface Signature {
   compressed: boolean;
   segwitType: string | null;
-  recovery: number;
+  recovery: RecoveryIdType;
   signature: Buffer;
 }
 
@@ -52,7 +54,7 @@ function decodeSignature(buffer: Buffer): Signature {
       : !(flagByte & 4)
       ? SEGWIT_TYPES.P2SH_P2WPKH
       : SEGWIT_TYPES.P2WPKH,
-    recovery: flagByte & 3,
+    recovery: (flagByte & 3) as RecoveryIdType,
     signature: buffer.slice(1),
   };
 }
@@ -88,7 +90,7 @@ function prepareSign(
     messagePrefixArg = undefined;
   }
   let segwitType = (sigOptions || ({} as any)).segwitType;
-  const extraEntropy = sigOptions?.extraEntropy;
+  const extraEntropy = sigOptions && sigOptions.extraEntropy;
   if (
     segwitType &&
     (typeof segwitType === 'string' || segwitType instanceof String)
@@ -135,10 +137,10 @@ export function sign(
   const hash = magicHash(message, messagePrefixArg);
   const sigObj = isSigner(privateKey)
     ? privateKey.sign(hash, extraEntropy)
-    : secp256k1.ecdsaSign(hash, privateKey, { data: extraEntropy });
+    : secp256k1.signRecoverable(hash, privateKey, extraEntropy);
   return encodeSignature(
     Buffer.from(sigObj.signature),
-    sigObj.recid,
+    sigObj.recoveryId,
     compressed,
     segwitType,
   );
@@ -163,12 +165,12 @@ export function signAsync(
       const hash = magicHash(message, messagePrefixArg);
       return isSigner(privateKey)
         ? privateKey.sign(hash, extraEntropy)
-        : secp256k1.ecdsaSign(hash, privateKey, { data: extraEntropy });
+        : secp256k1.signRecoverable(hash, privateKey, extraEntropy);
     })
     .then((sigObj) => {
       return encodeSignature(
         Buffer.from(sigObj.signature),
-        sigObj.recid,
+        sigObj.recoveryId,
         compressed,
         segwitType,
       );
@@ -207,12 +209,13 @@ export function verify(
   }
 
   const hash = magicHash(message, messagePrefix);
-  const publicKey = secp256k1.ecdsaRecover(
+  const publicKey = secp256k1.recover(
+    hash,
     parsed.signature,
     parsed.recovery,
-    hash,
     parsed.compressed,
   );
+  if (!publicKey) throw new Error('Public key is point at infinity!');
   const publicKeyHash = hash160(Buffer.from(publicKey));
   let actual;
   let expected;

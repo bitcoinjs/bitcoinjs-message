@@ -5,7 +5,6 @@ import ECPairFactory from 'ecpair';
 import * as bs58check from 'bs58check';
 import { bech32 } from 'bech32';
 import * as bitcoinjs from 'bitcoinjs-lib';
-import * as secp256k1 from 'secp256k1';
 import * as tinySecp256k1 from 'tiny-secp256k1';
 
 import { hash160 } from '../src/crypto';
@@ -42,9 +41,9 @@ describe('sign', () => {
         new BigInteger(f.d).toBuffer(32),
       ).privateKey;
       const signer = (hash: Buffer, ex: Buffer) =>
-        secp256k1.ecdsaSign(hash, pk!, { data: ex });
+        tinySecp256k1.signRecoverable(hash, pk!, ex);
       const signerAsync = async (hash: Buffer, ex: Buffer) =>
-        secp256k1.ecdsaSign(hash, pk!, { data: ex });
+        tinySecp256k1.signRecoverable(hash, pk!, ex);
       let signature = message.sign(
         f.message,
         pk,
