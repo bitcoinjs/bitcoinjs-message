@@ -1,6 +1,6 @@
 {
-  "name": "bitcoinjs-message",
-  "version": "2.2.0",
+  "name": "@bitgo-forks/bitcoinjs-message",
+  "version": "0.0.0-semantic-release-managed",
   "description": "bitcoinjs-message",
   "keywords": [
     "bitcoinjs-message",
@@ -19,7 +19,7 @@
   "types": "./index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bitcoinjs/bitcoinjs-message.git"
+    "url": "https://github.com/BitGo/bitcoinjs-message.git"
   },
   "scripts": {
     "coverage": "nyc tape test/*.js",
@@ -34,6 +34,7 @@
     "buffer-equals": "^1.0.3",
     "create-hash": "^1.1.2",
     "secp256k1": "5.0.0",
+    "semantic-release": "20.1.0",
     "varuint-bitcoin": "^1.0.1"
   },
   "devDependencies": {
