@@ -27,8 +27,8 @@ fixtures.valid.magicHash.forEach(f => {
 fixtures.valid.sign.forEach(f => {
   test('sign: ' + f.description, async t => {
     const pk = new bitcoin.ECPair(new BigInteger(f.d)).d.toBuffer(32)
-    const signer = (hash, ex) => secp256k1.sign(hash, pk, { data: ex })
-    const signerAsync = async (hash, ex) => secp256k1.sign(hash, pk, { data: ex })
+    const signer = (hash, ex) => secp256k1.ecdsaSign(hash, pk, { data: ex })
+    const signerAsync = async (hash, ex) => secp256k1.ecdsaSign(hash, pk, { data: ex })
     let signature = message.sign(
       f.message,
       pk,

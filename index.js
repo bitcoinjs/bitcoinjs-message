@@ -127,10 +127,10 @@ function sign (
   const hash = magicHash(message, messagePrefixArg)
   const sigObj = isSigner(privateKey)
     ? privateKey.sign(hash, extraEntropy)
-    : secp256k1.sign(hash, privateKey, { data: extraEntropy })
+    : secp256k1.ecdsaSign(hash, privateKey, { data: extraEntropy })
   return encodeSignature(
     sigObj.signature,
-    sigObj.recovery,
+    sigObj.recid,
     compressed,
     segwitType
   )
@@ -153,11 +153,11 @@ function signAsync (
     const hash = magicHash(message, messagePrefixArg)
     return isSigner(privateKey)
       ? privateKey.sign(hash, extraEntropy)
-      : secp256k1.sign(hash, privateKey, { data: extraEntropy })
+      : secp256k1.ecdsaSign(hash, privateKey, { data: extraEntropy })
   }).then((sigObj) => {
     return encodeSignature(
       sigObj.signature,
-      sigObj.recovery,
+      sigObj.recid,
       compressed,
       segwitType
     )
@@ -188,12 +188,13 @@ function verify (message, address, signature, messagePrefix, checkSegwitAlways) 
   }
 
   const hash = magicHash(message, messagePrefix)
-  const publicKey = secp256k1.recover(
-    hash,
+  const publicKey = secp256k1.ecdsaRecover(
     parsed.signature,
     parsed.recovery,
+    hash,
     parsed.compressed
   )
+
   const publicKeyHash = hash160(publicKey)
   let actual, expected
 
