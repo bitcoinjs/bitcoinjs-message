@@ -63,7 +63,7 @@ var message = 'This is an example of a signed message.'
 
 var secp256k1 = require('tiny-secp256k1')
 // Notice we are using the privateKey var from the outer scope inside the sign function.
-var signer = { signRecoverable: (hash, extraData) => secp256k1.signRecoverable(hash, privateKey, { data: extraData }) }
+var signer = { signRecoverable: (hash, extraData) => secp256k1.signRecoverable(hash, privateKey, extraData) }
 
 var signature = bitcoinMessage.sign(message, signer, keyPair.compressed)
 console.log(signature.toString('base64'))
@@ -93,8 +93,8 @@ var message = 'This is an example of a signed message.'
 
 var secp256k1 = require('tiny-secp256k1')
 // Note that a Signer will also work
-var signerAsync = { signRecoverable: (hash, extraData) => Promise.resolve(secp256k1.signRecoverable(hash, privateKey, { data: extraData })) }
-var signer = { signRecoverable: (hash, extraData) => secp256k1.signRecoverable(hash, privateKey, { data: extraData }) }
+var signerAsync = { signRecoverable: (hash, extraData) => Promise.resolve(secp256k1.signRecoverable(hash, privateKey, extraData)) }
+var signer = { signRecoverable: (hash, extraData) => secp256k1.signRecoverable(hash, privateKey, extraData) }
 
 bitcoinMessage.signAsync(message, signerAsync, keyPair.compressed).then(signature => {
   console.log(signature.toString('base64'))
