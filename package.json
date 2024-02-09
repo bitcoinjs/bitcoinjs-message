@@ -22,10 +22,12 @@
     "url": "https://github.com/bitcoinjs/bitcoinjs-message.git"
   },
   "scripts": {
+    "format": "npm run prettier -- --write",
+    "format:check": "prettier --check '**/*.{ts,js,json}'",
+    "prettier": "prettier '**/*.{ts,js,json}'",
     "coverage": "nyc tape test/*.js",
     "prepublish": "npm run test",
-    "standard": "standard",
-    "test": "npm run standard && npm run unit",
+    "test": "npm run format:check && npm run unit",
     "unit": "tape test/*.js"
   },
   "dependencies": {
@@ -40,7 +42,7 @@
     "bigi": "^1.4.1",
     "bitcoinjs-lib": "^3.2.0",
     "nyc": "^14.1.1",
-    "standard": "^12.0.1",
+    "prettier": "^3.2.5",
     "tape": "^4.5.1"
   },
   "engines": {
