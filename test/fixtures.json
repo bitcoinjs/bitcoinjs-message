@@ -80,7 +80,7 @@
         "description": "gives equal r, s values irrespective of point compression or segwit type",
         "message": "vires is numeris",
         "network": "bitcoin",
-        "d": "1",
+        "d": "0000000000000000000000000000000000000000000000000000000000000001",
         "signature": "HF8nHqFr3K2UKYahhX3soVeoW8W1ECNbr0wfck7lzyXjCS5Q16Ek45zyBuy1Fiy9sTPKVgsqqOuPvbycuVSSVl8=",
         "compressed": {
           "signature": "IF8nHqFr3K2UKYahhX3soVeoW8W1ECNbr0wfck7lzyXjCS5Q16Ek45zyBuy1Fiy9sTPKVgsqqOuPvbycuVSSVl8="
@@ -98,7 +98,7 @@
         "description": "supports alternative networks",
         "message": "vires is numeris",
         "network": "dogecoin",
-        "d": "1",
+        "d": "0000000000000000000000000000000000000000000000000000000000000001",
         "signature": "G6k+dZwJ8oOei3PCSpdj603fDvhlhQ+sqaFNIDvo/bI+Xh6zyIKGzZpyud6YhZ1a5mcrwMVtTWL+VXq/hC5Zj7s="
       }
     ],

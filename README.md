@@ -8,8 +8,9 @@
 ## Examples (Note about Electrum support at the bottom)
 
 ``` javascript
-var bitcoin = require('bitcoinjs-lib') // v4.x.x
-var bitcoinMessage = require('bitcoinjs-message')
+var tinysecp = require('tiny-secp256k1');
+var MessageFactory = require('bitcoinjs-message').MessageFactory
+var bitcoinMessage = MessageFactory(tinysecp)
 ```
 
 > sign(message, privateKey, compressed[, network.messagePrefix, sigOptions])
@@ -20,7 +21,7 @@ var bitcoinMessage = require('bitcoinjs-message')
 
 Sign a Bitcoin message
 ``` javascript
-var keyPair = bitcoin.ECPair.fromWIF('L4rK1yDtCWekvXuE6oXD9jCYfFNV2cWRpVuPLBcCU2z8TrisoyY1')
+var keyPair = ECPair.fromWIF('L4rK1yDtCWekvXuE6oXD9jCYfFNV2cWRpVuPLBcCU2z8TrisoyY1')
 var privateKey = keyPair.privateKey
 var message = 'This is an example of a signed message.'
 
@@ -32,7 +33,7 @@ console.log(signature.toString('base64'))
 To produce non-deterministic signatures you can pass an extra option to sign()
 ``` javascript
 var { randomBytes } = require('crypto')
-var keyPair = bitcoin.ECPair.fromWIF('L4rK1yDtCWekvXuE6oXD9jCYfFNV2cWRpVuPLBcCU2z8TrisoyY1')
+var keyPair = ECPair.fromWIF('L4rK1yDtCWekvXuE6oXD9jCYfFNV2cWRpVuPLBcCU2z8TrisoyY1')
 var privateKey = keyPair.privateKey
 var message = 'This is an example of a signed message.'
 
@@ -56,13 +57,13 @@ console.log(signature.toString('base64'))
 
 Sign a Bitcoin message using a Signer interface.
 ``` javascript
-var keyPair = bitcoin.ECPair.fromWIF('L4rK1yDtCWekvXuE6oXD9jCYfFNV2cWRpVuPLBcCU2z8TrisoyY1')
+var keyPair = ECPair.fromWIF('L4rK1yDtCWekvXuE6oXD9jCYfFNV2cWRpVuPLBcCU2z8TrisoyY1')
 var privateKey = keyPair.privateKey
 var message = 'This is an example of a signed message.'
 
-var secp256k1 = require('secp256k1')
+var secp256k1 = require('tiny-secp256k1')
 // Notice we are using the privateKey var from the outer scope inside the sign function.
-var signer = { sign: (hash, extraData) => secp256k1.sign(hash, privateKey, { data: extraData }) }
+var signer = { signRecoverable: (hash, extraData) => secp256k1.signRecoverable(hash, privateKey, { data: extraData }) }
 
 var signature = bitcoinMessage.sign(message, signer, keyPair.compressed)
 console.log(signature.toString('base64'))
@@ -74,7 +75,7 @@ console.log(signature.toString('base64'))
 
 Sign a Bitcoin message asynchronously
 ``` javascript
-var keyPair = bitcoin.ECPair.fromWIF('L4rK1yDtCWekvXuE6oXD9jCYfFNV2cWRpVuPLBcCU2z8TrisoyY1')
+var keyPair = ECPair.fromWIF('L4rK1yDtCWekvXuE6oXD9jCYfFNV2cWRpVuPLBcCU2z8TrisoyY1')
 var privateKey = keyPair.privateKey
 var message = 'This is an example of a signed message.'
 
@@ -86,14 +87,14 @@ bitcoinMessage.signAsync(message, privateKey, keyPair.compressed).then(signature
 
 Sign a Bitcoin message asynchronously using SignerAsync interface
 ``` javascript
-var keyPair = bitcoin.ECPair.fromWIF('L4rK1yDtCWekvXuE6oXD9jCYfFNV2cWRpVuPLBcCU2z8TrisoyY1')
+var keyPair = ECPair.fromWIF('L4rK1yDtCWekvXuE6oXD9jCYfFNV2cWRpVuPLBcCU2z8TrisoyY1')
 var privateKey = keyPair.privateKey
 var message = 'This is an example of a signed message.'
 
-var secp256k1 = require('secp256k1')
+var secp256k1 = require('tiny-secp256k1')
 // Note that a Signer will also work
-var signerAsync = { sign: (hash, extraData) => Promise.resolve(secp256k1.sign(hash, privateKey, { data: extraData })) }
-var signer = { sign: (hash, extraData) => secp256k1.sign(hash, privateKey, { data: extraData }) }
+var signerAsync = { signRecoverable: (hash, extraData) => Promise.resolve(secp256k1.signRecoverable(hash, privateKey, { data: extraData })) }
+var signer = { signRecoverable: (hash, extraData) => secp256k1.signRecoverable(hash, privateKey, { data: extraData }) }
 
 bitcoinMessage.signAsync(message, signerAsync, keyPair.compressed).then(signature => {
   console.log(signature.toString('base64'))

@@ -1,6 +1,6 @@
 {
   "name": "bitcoinjs-message",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "description": "bitcoinjs-message",
   "keywords": [
     "bitcoinjs-message",
@@ -31,19 +31,17 @@
     "unit": "tape test/*.js"
   },
   "dependencies": {
-    "bech32": "^1.1.3",
-    "bs58check": "^2.1.2",
-    "buffer-equals": "^1.0.3",
-    "create-hash": "^1.1.2",
-    "secp256k1": "^3.0.1",
-    "varuint-bitcoin": "^1.0.1"
+    "bech32": "^1.1.4",
+    "bs58check": "^3.0.1",
+    "varuint-bitcoin": "^1.1.2"
   },
   "devDependencies": {
-    "bigi": "^1.4.1",
-    "bitcoinjs-lib": "^3.2.0",
+    "bitcoinjs-lib": "^6.1.5",
+    "ecpair": "^2.1.0",
     "nyc": "^14.1.1",
     "prettier": "^3.2.5",
-    "tape": "^4.5.1"
+    "tape": "^4.5.1",
+    "tiny-secp256k1": "^2.2.3"
   },
   "engines": {
     "node": ">=0.10"

@@ -1,13 +1,16 @@
 const test = require('tape').test;
 const bs58check = require('bs58check');
 const bech32 = require('bech32');
-const createHash = require('create-hash');
-const bitcoin = require('bitcoinjs-lib');
-const BigInteger = require('bigi');
-const secp256k1 = require('secp256k1');
-const message = require('../');
+const secp256k1 = require('tiny-secp256k1');
+const MessageFactory = require('../').MessageFactory;
+const message = MessageFactory(secp256k1);
+const payments = require('bitcoinjs-lib').payments;
 
 const fixtures = require('./fixtures.json');
+
+const ecc = require('tiny-secp256k1');
+const ECPairFactory = require('ecpair').ECPairFactory;
+const ECPair = ECPairFactory(ecc);
 
 function getMessagePrefix(networkName) {
   return fixtures.networks[networkName];
@@ -25,11 +28,11 @@ fixtures.valid.magicHash.forEach(f => {
 });
 
 fixtures.valid.sign.forEach(f => {
-  test('sign: ' + f.description, async t => {
-    const pk = new bitcoin.ECPair(new BigInteger(f.d)).d.toBuffer(32);
-    const signer = (hash, ex) => secp256k1.sign(hash, pk, { data: ex });
+  test('signRecoverable: ' + f.description, async t => {
+    const pk = Buffer.from(f.d, 'hex');
+    const signer = (hash, ex) => secp256k1.signRecoverable(hash, pk, ex);
     const signerAsync = async (hash, ex) =>
-      secp256k1.sign(hash, pk, { data: ex });
+      secp256k1.signRecoverable(hash, pk, ex);
     let signature = message.sign(
       f.message,
       pk,
@@ -38,19 +41,19 @@ fixtures.valid.sign.forEach(f => {
     );
     let signature2 = message.sign(
       f.message,
-      { sign: signer },
+      { signRecoverable: signer },
       false,
       getMessagePrefix(f.network),
     );
     let signature3 = await message.signAsync(
       f.message,
-      { sign: signerAsync },
+      { signRecoverable: signerAsync },
       false,
       getMessagePrefix(f.network),
     );
     let signature4 = await message.signAsync(
       f.message,
-      { sign: signer },
+      { signRecoverable: signer },
       false,
       getMessagePrefix(f.network),
     );
@@ -206,9 +209,9 @@ fixtures.invalid.verify.forEach(f => {
 
 fixtures.randomSig.forEach(f => {
   test(f.description, t => {
-    const keyPair = bitcoin.ECPair.fromWIF(f.wif);
-    const privateKey = keyPair.d.toBuffer(32);
-    const address = keyPair.getAddress();
+    const keyPair = ECPair.fromWIF(f.wif);
+    const privateKey = keyPair.privateKey;
+    const { address } = payments.p2pkh({ pubkey: keyPair.publicKey });
     f.signatures.forEach(s => {
       const signature = message.sign(
         f.message,
@@ -223,13 +226,15 @@ fixtures.randomSig.forEach(f => {
 });
 
 test('Check that compressed signatures can be verified as segwit', t => {
-  const keyPair = bitcoin.ECPair.makeRandom();
-  const privateKey = keyPair.d.toBuffer(32);
-  const publicKey = keyPair.getPublicKeyBuffer();
+  const keyPair = ECPair.makeRandom();
+  const privateKey = keyPair.privateKey;
+  const publicKey = keyPair.publicKey;
   const publicKeyHash = hash160(publicKey);
   const p2shp2wpkhRedeemHash = segwitRedeemHash(publicKeyHash);
   // get addresses (p2pkh, p2sh-p2wpkh, p2wpkh)
-  const p2pkhAddress = keyPair.getAddress();
+  const { address: p2pkhAddress } = payments.p2pkh({
+    pubkey: keyPair.publicKey,
+  });
   const p2shp2wpkhAddress = bs58check.encode(
     Buffer.concat([Buffer.from([5]), p2shp2wpkhRedeemHash]),
   );
@@ -264,10 +269,10 @@ test('Check that compressed signatures can be verified as segwit', t => {
 });
 
 test('Check that invalid segwitType fails', t => {
-  const keyPair = bitcoin.ECPair.fromWIF(
+  const keyPair = ECPair.fromWIF(
     'L3n3e2LggPA5BuhXyBetWGhUfsEBTFe9Y6LhyAhY2mAXkA9jNE56',
   );
-  const privateKey = keyPair.d.toBuffer(32);
+  const privateKey = keyPair.privateKey;
 
   t.throws(() => {
     message.sign('Sign me', privateKey, true, { segwitType: 'XYZ' });
@@ -277,10 +282,10 @@ test('Check that invalid segwitType fails', t => {
 });
 
 test('Check that Buffers and wrapped Strings are accepted', t => {
-  const keyPair = bitcoin.ECPair.fromWIF(
+  const keyPair = ECPair.fromWIF(
     'L3n3e2LggPA5BuhXyBetWGhUfsEBTFe9Y6LhyAhY2mAXkA9jNE56',
   );
-  const privateKey = keyPair.d.toBuffer(32);
+  const privateKey = keyPair.privateKey;
 
   // eslint-disable-next-line no-new-wrappers
   const sig = message.sign(
@@ -298,11 +303,11 @@ test('Check that Buffers and wrapped Strings are accepted', t => {
   t.end();
 });
 
-function sha256(b) {
-  return createHash('sha256').update(b).digest();
-}
+const _ripemd160 = require('@noble/hashes/ripemd160').ripemd160;
+const _sha256 = require('@noble/hashes/sha256').sha256;
+
 function hash160(buffer) {
-  return createHash('ripemd160').update(sha256(buffer)).digest();
+  return Buffer.from(_ripemd160(_sha256(Uint8Array.from(buffer))));
 }
 function segwitRedeemHash(publicKeyHash) {
   const redeemScript = Buffer.concat([
